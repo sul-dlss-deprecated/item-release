@@ -1,0 +1,15 @@
+.bundle
+.yardoc
+doc/
+docs/
+*~
+coverage/
+coverage.data
+.idea
+*.tar.gz
+pid
+config/certs
+.rvmrc
+.DS_Store
+.ruby-version
+.ruby-gemset
