@@ -22,6 +22,7 @@ end
 # Load core robot services
 require 'dor-services'
 require 'lyber_core'
+require 'dor-fetcher'
 
 # TODO Maybe move auto-require to just run_robot and spec_helper?
 

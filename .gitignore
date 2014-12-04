@@ -9,6 +9,7 @@ coverage.data
 *.tar.gz
 pid
 config/certs
+config/environments/production.rb
 .rvmrc
 .DS_Store
 .ruby-version
