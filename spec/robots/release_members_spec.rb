@@ -6,6 +6,7 @@ describe Robots::DorRepo::ItemRelease::ReleaseMembers do
     @druid='aa222cc3333'
     setup_work_item(@druid)
     @r = Robots::DorRepo::ItemRelease::ReleaseMembers.new
+    allow(RestClient).to receive_messages(:post=>nil) # don't actually make the RestClient calls, just assume they work
   end  
 
   it "should run the robot" do
@@ -23,9 +24,15 @@ describe Robots::DorRepo::ItemRelease::ReleaseMembers do
   end
   
   it "should run for a collection and execute the item_members method" do
-    setup_release_item(@druid,:collection)
+    item_members=[{"druid"=>"druid:bb001zc5754", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"French Grand Prix and 12 Hour Rheims: 1954", "catkey"=>"3051728"},
+     {"druid"=>"druid:bb023nj3137", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"Snetterton Vanwall Trophy: 1958", "catkey"=>"3051732"},
+     {"druid"=>"druid:bb027yn4436", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"Crystal Palace BARC: 1954", "catkey"=>"3051733"},
+     {"druid"=>"druid:bb048rn5648", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"", "catkey"=>"3051734"}]
+    setup_release_item(@druid,:collection,item_members)
     expect(@release_item.is_collection?).to be true
-    expect(@release_item).to receive(:item_members).once # we should be looking up the members
+    expect(@release_item.item_members).to eq(item_members)
+    expect(@release_item).to receive(:item_members).twice # we should be looking up the members (first time to see if any items exist, second type to iterate)
+    expect(@r).to receive(:add_workflow).exactly(4).times
     @r.perform(@work_item)
   end
     

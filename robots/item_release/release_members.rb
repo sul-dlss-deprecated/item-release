@@ -26,9 +26,7 @@ module Robots       # Robot package
             if item.item_members # if there are any members, iterate through
               item.item_members.each do |member|
                 member_druid=member['druid']
-                LyberCore::Log.debug "...adding itemReleaseWF for #{member_druid}"
-                # TODO add workflow here
-                # TODO add retry logic here for adding workflow
+                add_workflow(member_druid)
               end
             else
               LyberCore::Log.debug "...no members found in #{item.object_type}"            
@@ -40,6 +38,14 @@ module Robots       # Robot package
           end
           
         end
+        
+        def add_workflow(druid)
+          # TODO add retry logic here for adding workflow
+          LyberCore::Log.debug "...adding itemReleaseWF for #{druid}"
+          url         = "#{Dor::Config.dor.service_root}/objects/druid:#{druid}/apo_workflows/itemReleaseWF"
+          resp=RestClient.post url, {}
+        end
+        
       end
 
     end
