@@ -41,11 +41,9 @@
 #
 
 sul-robots1-dev:
-  - dor_myDemoWF_a1-first:default:3 # 3 robots in default lane
-  - dor_myDemoWF_b2-second          # 1 robot in default lane
-  - dor_myDemoWF_c3-third:myLane    # 1 robot in myLane lane
+  - dor_itemReleaseWF_release-members:default:3 # 3 robots in default lane
+  - dor_itemRelease_release-publish          # 1 robot in default lane
 
 sul-robots2-dev:
-  - dor_myDemoWF_a1-first:*         # 1 robot in all lanes
-  - dor_myDemoWF_b2-second:default,myLane # 1 robot in default and myLane lanes
-  - dor_myDemoWF_c3-third:*:3       # 3 robots in all lanes
+  - dor_itemReleaseWF_release-members:*         # 1 robot in all lanes
+  - dor_itemReleaseWF_release-publish:default,myLane # 1 robot in default and myLane lanes

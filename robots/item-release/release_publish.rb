@@ -1,15 +1,15 @@
 # Robot class to run under multiplexing infrastructure
 module Robots       # Robot package
   module DorRepo    # Use DorRepo/SdrRepo to avoid name collision with Dor module
-    module MyDemo   # This is your workflow package name (using CamelCase)
+    module ItemRelease   # This is your workflow package name (using CamelCase)
 
-      class B2Second # This is your robot name (using CamelCase)
+      class ReleasePublish # This is your robot name (using CamelCase)
         # Build off the base robot implementation which implements
         # features common to all robots
         include LyberCore::Robot 
 
         def initialize
-          super('dor', 'myDemoWF', 'b2-second', check_queued_status: true) # init LyberCore::Robot
+          super('dor', 'releaseWF', 'release-publish', check_queued_status: true) # init LyberCore::Robot
         end
 
         # `perform` is the main entry point for the robot. This is where
@@ -17,7 +17,7 @@ module Robots       # Robot package
         #
         # @param [String] druid -- the Druid identifier for the object to process
         def perform(druid)
-          LyberCore::Log.debug "b2-second working on #{druid}"
+          LyberCore::Log.debug "release-publish working on #{druid}"
           #
           # ... your robot work goes here ...
           #
