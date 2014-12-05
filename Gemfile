@@ -9,6 +9,7 @@ gem 'slop', '~> 3.5.0'          # for bin/run_robot
 gem 'rake', '~> 10.3.2'
 gem 'dor-fetcher'
 gem 'retries'
+gem 'dor-workflow-service'
 
 group :development do
   if File.exists?(mygems = File.join(ENV['HOME'],'.gemfile'))

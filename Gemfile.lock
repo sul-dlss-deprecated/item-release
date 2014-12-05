@@ -285,6 +285,7 @@ DEPENDENCIES
   debugger
   dor-fetcher
   dor-services (~> 4.8)
+  dor-workflow-service
   holepicker (~> 0.3, >= 0.3.3)
   lyber-core (~> 3.2, >= 3.2.4)
   lyberteam-capistrano-devel (~> 3.0)

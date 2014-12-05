@@ -61,28 +61,20 @@ module Dor::ItemRelease
     end
 
     def self.add_workflow_for_item(druid)
-      
-      LyberCore::Log.debug "...adding workflow #{Dor::Config.itemRelease.workflow_name} for #{druid}"
-      url         = "#{Dor::Config.dor.service_root}/objects/#{druid}/apo_workflows/#{Dor::Config.itemRelease.workflow_name}"
-      self.webservice_call(:post,url,{})
-
-      # set release-members step to completed
-      url         = "#{Dor::Config.dor.service_root}/objects/#{druid}/apo_workflows/#{Dor::Config.itemRelease.workflow_name}/release-members/completed"
-      self.webservice_call(:post,url,{})
-
-    end
     
-    def self.webservice_call(method,url,params)
-      
       handler = Proc.new do |exception, attempt_number, total_delay|
-        LyberCore::Log.debug "#{exception.class} on web service attempt #{attempt_number} for #{druid} to #{url}"
+        LyberCore::Log.debug "#{exception.class} on workflow service attempt #{attempt_number} for #{druid} to #{url}"
       end
+        
+      LyberCore::Log.debug "...adding workflow #{Dor::Config.itemRelease.workflow_name} for #{druid}"
       
-      with_retries(:max_tries => Dor::Config.itemRelease.max_tries, :handler => handler, :base_sleep_seconds => Dor::Config.itemRelease.base_sleep_seconds, :max_sleep_seconds => Dor::Config.itemRelease.max_sleep_seconds, :rescue => [RestClient::Unauthorized, RestClient::RequestFailed]) do |attempt|
-        resp=RestClient.send method,url,params
+      # initiate workflow and set release-members step to completed
+      with_retries(:max_tries => Dor::Config.itemRelease.max_tries, :handler => handler, :base_sleep_seconds => Dor::Config.itemRelease.base_sleep_seconds, :max_sleep_seconds => Dor::Config.itemRelease.max_sleep_seconds) do |attempt|
+        @fobj.initialize_workflow(Dor::Config.itemRelease.workflow_name)
+        Dor::WorkflowService.update_workflow_status 'dor', druid, Dor::Config.itemRelease.workflow_name, 'release-members', 'completed'
       end
 
     end
-    
+        
   end  # class Item
 end # module
