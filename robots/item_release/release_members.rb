@@ -41,9 +41,10 @@ module Robots       # Robot package
         
         def add_workflow(druid)
           # TODO add retry logic here for adding workflow
-          LyberCore::Log.debug "...adding itemReleaseWF for #{druid}"
-          url         = "#{Dor::Config.dor.service_root}/objects/druid:#{druid}/apo_workflows/itemReleaseWF"
+          LyberCore::Log.debug "...adding workflow #{Dor::Config.itemRelease.workflow_name} for #{druid}"
+          url         = "#{Dor::Config.dor.service_root}/objects/druid:#{druid}/apo_workflows/#{Dor::Config.itemRelease.workflow_name}"
           resp=RestClient.post url, {}
+          # TODO set release-members step to completed
         end
         
       end

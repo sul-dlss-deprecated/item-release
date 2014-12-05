@@ -41,9 +41,9 @@
 #
 
 sul-robots1-dev:
-  - dor_itemReleaseWF_release-members:default:3 # 3 robots in default lane
-  - dor_itemRelease_release-publish          # 1 robot in default lane
+  - dor_releaseWF_release-members:default:3 # 3 robots in default lane
+  - dor_release_release-publish          # 1 robot in default lane
 
 sul-robots2-dev:
-  - dor_itemReleaseWF_release-members:*         # 1 robot in all lanes
-  - dor_itemReleaseWF_release-publish:default,myLane # 1 robot in default and myLane lanes
+  - dor_releaseWF_release-members:*         # 1 robot in all lanes
+  - dor_releaseWF_release-publish:default,myLane # 1 robot in default and myLane lanes

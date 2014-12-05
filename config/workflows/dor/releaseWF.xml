@@ -1,6 +1,6 @@
 <!-- Used by the robot master -->
 <?xml version="1.0"?>
-<workflow-def id="itemReleaseWF" repository="dor">
+<workflow-def id="releaseWF" repository="dor">
 	<process name="start" sequence="1" status="completed" skip-queue="true">
 		<label>Initiate item release of the object</label>
 	</process>

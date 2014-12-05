@@ -20,6 +20,7 @@ Dor::Config.configure do
   
   itemRelease do
     fetcher_root 'http://localhost:3000/'
+    workflow_name 'releaseWF'
   end
 
   dor do
