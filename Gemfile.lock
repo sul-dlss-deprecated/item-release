@@ -200,6 +200,7 @@ GEM
     rest-client (1.6.8)
       mime-types (~> 1.16)
       rdoc (>= 2.4.2)
+    retries (0.0.5)
     robot-controller (1.0.0)
       bluepill (~> 0.0.67)
       resque (~> 1.25.2)
@@ -289,6 +290,7 @@ DEPENDENCIES
   lyberteam-capistrano-devel (~> 3.0)
   pry (~> 0.10.0)
   rake (~> 10.3.2)
+  retries
   robot-controller (~> 1.0)
   rspec
   slop (~> 3.5.0)

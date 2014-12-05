@@ -1,4 +1,4 @@
-CERT_DIR = File.join(File.dirname(__FILE__), "..", "certs")
+CERT_DIR = File.join(File.dirname(__FILE__), "../..", "certs")
 
 Dor::Config.configure do
 
@@ -21,6 +21,9 @@ Dor::Config.configure do
   itemRelease do
     fetcher_root 'http://localhost:3000/'
     workflow_name 'releaseWF'
+    max_tries  5  # the number of attempts to retry service calls before failing
+    max_sleep_seconds   120  # max sleep seconds between tries
+    base_sleep_seconds  10   # base sleep seconds between tries    
   end
 
   dor do
