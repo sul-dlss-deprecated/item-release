@@ -20,35 +20,32 @@ module Robots       # Robot package
           LyberCore::Log.debug "release-members working on #{druid}"
           
           item = Dor::ItemRelease::Item.new :druid => druid
-                              
-          if item.is_collection? || item.is_set? # this is a collection or set
-            LyberCore::Log.debug "...fetching members of #{item.object_type}"
-            if item.item_members # if there are any members, iterate through
-              item.item_members.each do |member|
-                member_druid=member['druid']
-                add_workflow(member_druid)
-              end
-            else
-              LyberCore::Log.debug "...no members found in #{item.object_type}"            
-            end
-          elsif item.is_apo?
-            LyberCore::Log.debug "...this is an APO, noop"            
-          else
-            LyberCore::Log.debug "...not a collection or set or apo, noop"
-          end
           
-        end
-        
-        def add_workflow(druid)
-          # TODO add retry logic here for adding workflow
-          LyberCore::Log.debug "...adding workflow #{Dor::Config.itemRelease.workflow_name} for #{druid}"
-          url         = "#{Dor::Config.dor.service_root}/objects/druid:#{druid}/apo_workflows/#{Dor::Config.itemRelease.workflow_name}"
-          resp=RestClient.post url, {}
-          # TODO set release-members step to completed
-        end
-        
-      end
-
+          case item.object_type
+            
+            when "collection","set"  # this is a collection or set, fetch the members                   
+            
+              LyberCore::Log.debug "...fetching members of #{item.object_type}"
+              if item.item_members # if there are any members, iterate through
+            
+                item.item_members.each {|member| Dor::ItemRelease::Item.add_workflow_for_item(member['druid'])}
+            
+              else # no members found
+            
+                LyberCore::Log.debug "...no members found in #{item.object_type}"            
+            
+              end # end check for any members
+            
+            else # this is not a collection of set
+            
+              LyberCore::Log.debug "...this is a #{item.object_type}, NOOP"            
+            
+            end # end case statement
+          
+        end # end peform method 
+         
+      end # end releaseMembers class
+                
     end
   end
 end

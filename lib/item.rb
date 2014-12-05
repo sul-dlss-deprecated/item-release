@@ -26,23 +26,36 @@ module Dor::ItemRelease
         obj_type=object.identityMetadata.objectType
         @obj_type=(obj_type.nil? ? 'unknown' : obj_type.first)
       end
-      @obj_type
+      @obj_type.downcase.strip
     end
     
     def is_item?
-      object_type.strip == 'item'
+      object_type == 'item'
     end
     
     def is_collection?
-      object_type.strip == 'collection'
+      object_type == 'collection'
     end
 
     def is_set?
-      object_type.strip == 'set'
+      object_type == 'set'
     end
 
     def is_apo?
-      object_type.strip == 'adminPolicy'
+      object_type == 'adminPolicy'
+    end
+
+    def self.add_workflow_for_item(druid)
+      
+      # TODO add retry logic here for adding workflow
+      LyberCore::Log.debug "...adding workflow #{Dor::Config.itemRelease.workflow_name} for #{druid}"
+      url         = "#{Dor::Config.dor.service_root}/objects/druid:#{druid}/workflows/#{Dor::Config.itemRelease.workflow_name}"
+      resp=RestClient.post url, {}
+
+      # set release-members step to completed
+      url         = "#{Dor::Config.dor.service_root}/objects/druid:#{druid}/workflows/#{Dor::Config.itemRelease.workflow_name}/release-members/completed"
+      resp=RestClient.post url, {}
+
     end
 
   end  

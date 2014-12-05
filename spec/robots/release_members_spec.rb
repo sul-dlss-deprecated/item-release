@@ -32,7 +32,7 @@ describe Robots::DorRepo::ItemRelease::ReleaseMembers do
     expect(@release_item.is_collection?).to be true
     expect(@release_item.item_members).to eq(item_members)
     expect(@release_item).to receive(:item_members).twice # we should be looking up the members (first time to see if any items exist, second type to iterate)
-    expect(@r).to receive(:add_workflow).exactly(4).times
+    expect(Dor::ItemRelease::Item).to receive(:add_workflow_for_item).exactly(4).times
     @r.perform(@work_item)
   end
     
