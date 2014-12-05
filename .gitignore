@@ -9,6 +9,7 @@ coverage.data
 *.tar.gz
 pid
 config/certs
+config/environments/development.rb
 config/environments/production.rb
 .rvmrc
 .DS_Store

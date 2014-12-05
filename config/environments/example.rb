@@ -11,13 +11,15 @@ Dor::Config.configure do
     key_file  File.join(CERT_DIR, "dlss-dev-test.key")
     key_pass  ''
   end
+
+  workflow.url 'https://example.com/workflow/'
   
   robots do 
     workspace '/tmp'
   end
   
   itemRelease do
-    fetcher_root 'https://dor-fetcher-service/'
+    fetcher_root 'http://localhost:3000/'
     workflow_name 'releaseWF'
   end
 
