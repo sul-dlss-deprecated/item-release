@@ -6,7 +6,7 @@ describe Robots::DorRepo::ItemRelease::ReleaseMembers do
     @druid='aa222cc3333'
     setup_work_item(@druid)
     @r = Robots::DorRepo::ItemRelease::ReleaseMembers.new
-    allow(RestClient).to receive_messages(:post=>nil) # don't actually make the RestClient calls, just assume they work
+    allow(RestClient).to receive_messages(:post=>nil,:get=>nil,:put=>nil) # don't actually make the RestClient calls, just assume they work
   end  
 
   it "should run the robot" do

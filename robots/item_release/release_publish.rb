@@ -9,7 +9,7 @@ module Robots       # Robot package
         include LyberCore::Robot 
 
         def initialize
-          super('dor', 'releaseWF', 'release-publish', check_queued_status: true) # init LyberCore::Robot
+          super('dor', Dor::Config.itemRelease.workflow_name, 'release-publish', check_queued_status: true) # init LyberCore::Robot
         end
 
         # `perform` is the main entry point for the robot. This is where
@@ -17,14 +17,13 @@ module Robots       # Robot package
         #
         # @param [String] druid -- the Druid identifier for the object to process
         def perform(druid)
+
           LyberCore::Log.debug "release-publish working on #{druid}"
-          #
-          # ... your robot work goes here ...
-          #
-          # for example:
-          #     obj = Dor::Item.find(druid)
-          #     obj.publish_metadata
-          #
+
+          item = Dor::ItemRelease::Item.new :druid => druid
+
+          item.object.publish_metadata if item.republish_needed?
+                      
         end
       end
 

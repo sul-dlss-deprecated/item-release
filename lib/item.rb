@@ -44,6 +44,11 @@ module Dor::ItemRelease
       @obj_type.downcase.strip
     end
     
+    def republish_needed?
+      #TODO implement logic here
+      true
+    end
+    
     def is_item?
       object_type == 'item'
     end

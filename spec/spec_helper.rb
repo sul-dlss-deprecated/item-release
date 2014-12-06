@@ -13,8 +13,11 @@ def setup_work_item(druid)
 end
 
 def setup_release_item(druid,obj_type,item_members=nil)
-  @release_item=double("release_item")
+  @release_item=double(Dor::ItemRelease::Item)
   @dor_item=double(Dor::Item)
+  allow(@dor_item).to receive_messages(
+    :publish_metadata=>nil,
+      )
   allow(@release_item).to receive_messages(
       :druid=>druid,
       :object=>@dor_item,
@@ -23,7 +26,7 @@ def setup_release_item(druid,obj_type,item_members=nil)
       :"is_collection?"=>(obj_type==:collection),
       :"is_set?"=>(obj_type==:set),
       :"is_apo?"=>(obj_type==:apo),
-      :item_members=>item_members
+      :item_members=>item_members,
     )
   allow(Dor::ItemRelease::Item).to receive_messages(:new=>@release_item)
 end

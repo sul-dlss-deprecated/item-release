@@ -9,7 +9,7 @@ module Robots       # Robot package
         include LyberCore::Robot 
         
         def initialize
-          super('dor', 'releaseWF', 'release-members', check_queued_status: true) # init LyberCore::Robot
+          super('dor', Dor::Config.itemRelease.workflow_name, 'release-members', check_queued_status: true) # init LyberCore::Robot
         end
 
         # `perform` is the main entry point for the robot. This is where
