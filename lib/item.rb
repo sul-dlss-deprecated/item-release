@@ -36,6 +36,15 @@ module Dor::ItemRelease
       members['items']
     end
     
+    def sub_collections
+      unless @sub_collections
+        @sub_collections=[]
+        @sub_collections += members['sets'] if members['sets']
+        @sub_collections += members['collections'] if members['collections']  
+      end
+      @sub_collections
+    end
+    
     def object_type
       unless @obj_type
         obj_type=object.identityMetadata.objectType
@@ -65,21 +74,45 @@ module Dor::ItemRelease
       object_type == 'adminPolicy'
     end
 
+    def self.add_workflow_for_collection(druid)
+      self.create_workflow(druid)
+    end
+
     def self.add_workflow_for_item(druid)
+      self.create_workflow(druid)
+      self.set_release_to_completed(druid)
+    end
+    
+    def self.create_workflow(druid)
     
       handler = Proc.new do |exception, attempt_number, total_delay|
-        LyberCore::Log.debug "#{exception.class} on workflow service attempt #{attempt_number} for #{druid} to #{url}"
+        LyberCore::Log.debug "#{exception.class} on initialize workflow attempt #{attempt_number} for #{druid}"
       end
         
       LyberCore::Log.debug "...adding workflow #{Dor::Config.itemRelease.workflow_name} for #{druid}"
       
-      # initiate workflow and set release-members step to completed
+      # initiate workflow
       with_retries(:max_tries => Dor::Config.itemRelease.max_tries, :handler => handler, :base_sleep_seconds => Dor::Config.itemRelease.base_sleep_seconds, :max_sleep_seconds => Dor::Config.itemRelease.max_sleep_seconds) do |attempt|
-        @fobj.initialize_workflow(Dor::Config.itemRelease.workflow_name)
+        obj=Dor::Item.find(druid)
+        obj.initialize_workflow(Dor::Config.itemRelease.workflow_name)
+      end
+
+    end
+
+    def self.set_release_to_completed(druid)
+    
+      handler = Proc.new do |exception, attempt_number, total_delay|
+        LyberCore::Log.debug "#{exception.class} on workflow service attempt #{attempt_number} for #{druid}"
+      end
+        
+      LyberCore::Log.debug "...setting release to completed in #{Dor::Config.itemRelease.workflow_name} for #{druid}"
+      
+      # set release-members step to completed
+      with_retries(:max_tries => Dor::Config.itemRelease.max_tries, :handler => handler, :base_sleep_seconds => Dor::Config.itemRelease.base_sleep_seconds, :max_sleep_seconds => Dor::Config.itemRelease.max_sleep_seconds) do |attempt|
         Dor::WorkflowService.update_workflow_status 'dor', druid, Dor::Config.itemRelease.workflow_name, 'release-members', 'completed'
       end
 
     end
-        
+            
   end  # class Item
 end # module

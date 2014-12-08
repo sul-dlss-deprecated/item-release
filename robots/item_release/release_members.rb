@@ -23,12 +23,16 @@ module Robots       # Robot package
           
           case item.object_type
             
-            when "collection","set"  # this is a collection or set, fetch the members                   
+            when "collection","set"  # this is a collection or set, initialize workflow for all item members and sub-collections                  
             
               LyberCore::Log.debug "...fetching members of #{item.object_type}"
-              if item.item_members # if there are any members, iterate through
+              if item.item_members # if there are any members, iterate through and add item workflows (which includes setting the first step to completed)
             
-                item.item_members.each {|member| Dor::ItemRelease::Item.add_workflow_for_item(member['druid'])}
+                item.item_members.each {|item_member| Dor::ItemRelease::Item.add_workflow_for_item(item_member['druid'])}
+            
+              elsif item.sub_collections # if there are any sub-collections, iterate through and add collection workflows
+
+                  item.sub_collections.each {|sub_collection| Dor::ItemRelease::Item.add_workflow_for_collection(sub_collection['druid'])}
             
               else # no members found
             
