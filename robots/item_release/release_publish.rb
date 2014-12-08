@@ -22,6 +22,15 @@ module Robots       # Robot package
 
           item = Dor::ItemRelease::Item.new :druid => druid
 
+          # TODO Check item's collections tags here or in Dor::Item?
+          
+#          collections=item.collections            # gives an array of fedora collection objects for this item
+
+#          item.tags                    # gives us an array of tags
+#          item.add_tag("Key: Value")   # adds a new tag
+#          item.save                    # saves the item
+
+          # TODO define the republish_needed? method on Dor::Item
           item.object.publish_metadata if item.republish_needed?
                       
         end
