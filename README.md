@@ -28,6 +28,17 @@ bundle exec rspec spec
 
 == Testing on the console
 
+Specify the environment you want to use:
+
 bin/console development  
+
+== Run a single robot on a specific ddruid
+
+Specify the robot you want to run ("release-members" or "release-publish"), also specify environment with -e flag and druid with -d flag.
+If you want to run multiple druids, instead of specifying a single druid with a -d flag, you can specify a text filename as a -f flag, with one druid per line.
+
+bin/run_robot dor:releaseWF:release-publish -e development -d druid:bb027yn4436
+
+
 
 
