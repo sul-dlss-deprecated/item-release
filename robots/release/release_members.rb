@@ -1,7 +1,7 @@
 # Robot class to run under multiplexing infrastructure
 module Robots       # Robot package
   module DorRepo    # Use DorRepo/SdrRepo to avoid name collision with Dor module
-    module ItemRelease   # This is your workflow package name (using CamelCase)
+    module Release   # This is your workflow package name (using CamelCase)
 
       class ReleaseMembers # This is your robot name (using CamelCase)
         # Build off the base robot implementation which implements
@@ -9,7 +9,7 @@ module Robots       # Robot package
         include LyberCore::Robot 
         
         def initialize
-          super('dor', Dor::Config.itemRelease.workflow_name, 'release-members', check_queued_status: true) # init LyberCore::Robot
+          super('dor', Dor::Config.release.workflow_name, 'release-members', check_queued_status: true) # init LyberCore::Robot
         end
 
         # `perform` is the main entry point for the robot. This is where
@@ -19,7 +19,7 @@ module Robots       # Robot package
         def perform(druid)
           LyberCore::Log.debug "release-members working on #{druid}"
           
-          item = Dor::ItemRelease::Item.new :druid => druid
+          item = Dor::Release::Item.new :druid => druid
           
           case item.object_type
             
@@ -28,11 +28,11 @@ module Robots       # Robot package
               LyberCore::Log.debug "...fetching members of #{item.object_type}"
               if item.item_members # if there are any members, iterate through and add item workflows (which includes setting the first step to completed)
             
-                item.item_members.each {|item_member| Dor::ItemRelease::Item.add_workflow_for_item(item_member['druid'])}
+                item.item_members.each {|item_member| Dor::Release::Item.add_workflow_for_item(item_member['druid'])}
             
               elsif item.sub_collections # if there are any sub-collections, iterate through and add collection workflows
 
-                  item.sub_collections.each {|sub_collection| Dor::ItemRelease::Item.add_workflow_for_collection(sub_collection['druid'])}
+                  item.sub_collections.each {|sub_collection| Dor::Release::Item.add_workflow_for_collection(sub_collection['druid'])}
             
               else # no members found
             

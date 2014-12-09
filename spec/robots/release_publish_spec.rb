@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe Robots::DorRepo::ItemRelease::ReleasePublish do
+describe Robots::DorRepo::Release::ReleasePublish do
 
   before :each do
     @druid='aa222cc3333'
     setup_work_item(@druid)
-    @r = Robots::DorRepo::ItemRelease::ReleasePublish.new
+    @r = Robots::DorRepo::Release::ReleasePublish.new
   end  
 
   it "should run the robot when a republish is needed, calling publish metadata on the dor item" do

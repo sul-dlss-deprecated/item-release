@@ -1,13 +1,13 @@
 require "retries"
 
-module Dor::ItemRelease
+module Dor::Release
 
   class Item
   
     def initialize(params = {})
       # Takes a druid, either as a string or as a Druid object.
       @druid = params[:druid]
-      @fetcher = DorFetcher::Client.new({:service_url => Dor::Config.itemRelease.fetcher_root})
+      @fetcher = DorFetcher::Client.new({:service_url => Dor::Config.release.fetcher_root})
     end
 
     def object
@@ -21,7 +21,7 @@ module Dor::ItemRelease
           LyberCore::Log.debug "#{exception.class} on dor-fetcher-service get members call #{attempt_number} for #{@druid}"
         end
       
-        with_retries(:max_tries => Dor::Config.itemRelease.max_tries, :handler => handler, :base_sleep_seconds => Dor::Config.itemRelease.base_sleep_seconds, :max_sleep_seconds => Dor::Config.itemRelease.max_sleep_seconds) do |attempt|
+        with_retries(:max_tries => Dor::Config.release.max_tries, :handler => handler, :base_sleep_seconds => Dor::Config.release.base_sleep_seconds, :max_sleep_seconds => Dor::Config.release.max_sleep_seconds) do |attempt|
            @members=@fetcher.get_collection(@druid)  # cache members in an instance variable
         end
         
@@ -54,8 +54,11 @@ module Dor::ItemRelease
     end
     
     def republish_needed?
-      #TODO implement logic here
-      true
+      #TODO implement logic here, presumably by calling a method on dor-services-gem
+      false
+      
+      #LyberCore::Log.debug "republishing metadatra for #{@druid}"
+      
     end
     
     def is_item?
@@ -89,12 +92,12 @@ module Dor::ItemRelease
         LyberCore::Log.debug "#{exception.class} on initialize workflow attempt #{attempt_number} for #{druid}"
       end
         
-      LyberCore::Log.debug "...adding workflow #{Dor::Config.itemRelease.workflow_name} for #{druid}"
+      LyberCore::Log.debug "...adding workflow #{Dor::Config.release.workflow_name} for #{druid}"
       
       # initiate workflow
-      with_retries(:max_tries => Dor::Config.itemRelease.max_tries, :handler => handler, :base_sleep_seconds => Dor::Config.itemRelease.base_sleep_seconds, :max_sleep_seconds => Dor::Config.itemRelease.max_sleep_seconds) do |attempt|
+      with_retries(:max_tries => Dor::Config.release.max_tries, :handler => handler, :base_sleep_seconds => Dor::Config.release.base_sleep_seconds, :max_sleep_seconds => Dor::Config.release.max_sleep_seconds) do |attempt|
         obj=Dor::Item.find(druid)
-        obj.initialize_workflow(Dor::Config.itemRelease.workflow_name)
+        obj.initialize_workflow(Dor::Config.release.workflow_name)
       end
 
     end
@@ -105,11 +108,11 @@ module Dor::ItemRelease
         LyberCore::Log.debug "#{exception.class} on workflow service attempt #{attempt_number} for #{druid}"
       end
         
-      LyberCore::Log.debug "...setting release to completed in #{Dor::Config.itemRelease.workflow_name} for #{druid}"
+      LyberCore::Log.debug "...setting release to completed in #{Dor::Config.release.workflow_name} for #{druid}"
       
       # set release-members step to completed
-      with_retries(:max_tries => Dor::Config.itemRelease.max_tries, :handler => handler, :base_sleep_seconds => Dor::Config.itemRelease.base_sleep_seconds, :max_sleep_seconds => Dor::Config.itemRelease.max_sleep_seconds) do |attempt|
-        Dor::WorkflowService.update_workflow_status 'dor', druid, Dor::Config.itemRelease.workflow_name, 'release-members', 'completed'
+      with_retries(:max_tries => Dor::Config.release.max_tries, :handler => handler, :base_sleep_seconds => Dor::Config.release.base_sleep_seconds, :max_sleep_seconds => Dor::Config.release.max_sleep_seconds) do |attempt|
+        Dor::WorkflowService.update_workflow_status 'dor', druid, Dor::Config.release.workflow_name, 'release-members', 'completed'
       end
 
     end

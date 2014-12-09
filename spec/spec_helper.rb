@@ -13,7 +13,7 @@ def setup_work_item(druid)
 end
 
 def setup_release_item(druid,obj_type,item_members=nil)
-  @release_item=double(Dor::ItemRelease::Item)
+  @release_item=double(Dor::Release::Item)
   @dor_item=double(Dor::Item)
   allow(@dor_item).to receive_messages(
     :publish_metadata=>nil,
@@ -28,5 +28,5 @@ def setup_release_item(druid,obj_type,item_members=nil)
       :"is_apo?"=>(obj_type==:apo),
       :item_members=>item_members,
     )
-  allow(Dor::ItemRelease::Item).to receive_messages(:new=>@release_item)
+  allow(Dor::Release::Item).to receive_messages(:new=>@release_item)
 end

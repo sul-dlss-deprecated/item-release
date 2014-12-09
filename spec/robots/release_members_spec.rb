@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe Robots::DorRepo::ItemRelease::ReleaseMembers do
+describe Robots::DorRepo::Release::ReleaseMembers do
 
   before :each do
     @druid='aa222cc3333'
     setup_work_item(@druid)
-    @r = Robots::DorRepo::ItemRelease::ReleaseMembers.new
+    @r = Robots::DorRepo::Release::ReleaseMembers.new
     allow(RestClient).to receive_messages(:post=>nil,:get=>nil,:put=>nil) # don't actually make the RestClient calls, just assume they work
   end  
 
@@ -32,7 +32,7 @@ describe Robots::DorRepo::ItemRelease::ReleaseMembers do
     expect(@release_item.is_collection?).to be true
     expect(@release_item.item_members).to eq(item_members)
     expect(@release_item).to receive(:item_members).twice # we should be looking up the members (first time to see if any items exist, second type to iterate)
-    expect(Dor::ItemRelease::Item).to receive(:add_workflow_for_item).exactly(4).times
+    expect(Dor::Release::Item).to receive(:add_workflow_for_item).exactly(4).times
     @r.perform(@work_item)
   end
     

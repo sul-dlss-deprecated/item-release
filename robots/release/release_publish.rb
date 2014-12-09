@@ -1,7 +1,7 @@
 # Robot class to run under multiplexing infrastructure
 module Robots       # Robot package
   module DorRepo    # Use DorRepo/SdrRepo to avoid name collision with Dor module
-    module ItemRelease   # This is your workflow package name (using CamelCase)
+    module Release   # This is your workflow package name (using CamelCase)
 
       class ReleasePublish # This is your robot name (using CamelCase)
         # Build off the base robot implementation which implements
@@ -9,7 +9,7 @@ module Robots       # Robot package
         include LyberCore::Robot 
 
         def initialize
-          super('dor', Dor::Config.itemRelease.workflow_name, 'release-publish', check_queued_status: true) # init LyberCore::Robot
+          super('dor', Dor::Config.release.workflow_name, 'release-publish', check_queued_status: true) # init LyberCore::Robot
         end
 
         # `perform` is the main entry point for the robot. This is where
@@ -20,7 +20,7 @@ module Robots       # Robot package
 
           LyberCore::Log.debug "release-publish working on #{druid}"
 
-          item = Dor::ItemRelease::Item.new :druid => druid
+          item = Dor::Release::Item.new :druid => druid
 
           # TODO Check item's collections tags here or in Dor::Item?
           

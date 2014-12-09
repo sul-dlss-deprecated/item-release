@@ -19,7 +19,7 @@ Dor::Config.configure do
     workspace '/tmp'
   end
   
-  itemRelease do
+  release do
     fetcher_root 'http://localhost:3000/'
     workflow_name 'releaseWF'
     max_tries  5  # the number of attempts to retry service calls before failing
