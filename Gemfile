@@ -19,7 +19,7 @@ group :development do
   gem 'vcr'
   gem 'coveralls'
   gem 'awesome_print'
-  gem 'byebug'
+  gem 'debugger', :platform => :ruby_19
 	gem 'yard'
 	gem 'capistrano', '~> 3.2.1'
   gem 'capistrano-bundler', '~> 1.1'
