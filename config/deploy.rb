@@ -4,15 +4,18 @@
 set :rvm_type, :system
 set :rvm_ruby_string, 'ruby-1.9.3-p484' # dor-services requires 1.9.3
 
-set :application, 'releaseWF'
+set :application, 'item-release'
 set :repo_url, 'https://github.com/sul-dlss/item-release.git'
+
+set :home_directory, "/home/lyberadmin"
+
 set :branch, 'master'
 
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
 
 # Default deploy_to directory is /var/www/my_app
-set :deploy_to, '/home/lyberadmin/item-release'
+set :deploy_to, "#{fetch(:home_directory)}/#{fetch(:application)}"
 
 # Default value for :scm is :git
 # set :scm, :git

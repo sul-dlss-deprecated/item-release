@@ -49,6 +49,9 @@ GEM
       capistrano (~> 3.0)
     capistrano-releaseboard (0.0.1)
       faraday
+    capistrano-rvm (0.1.2)
+      capistrano (~> 3.0)
+      sshkit (~> 1.2)
     coderay (1.1.0)
     columnize (0.9.0)
     confstruct (0.2.7)
@@ -282,12 +285,12 @@ DEPENDENCIES
   awesome_print
   capistrano (~> 3.2.1)
   capistrano-bundler (~> 1.1)
+  capistrano-rvm
   coveralls
   debugger
   dor-fetcher
   dor-services (~> 4.8)
   dor-workflow-service
-  holepicker (~> 0.3, >= 0.3.3)
   json_pure
   lyber-core (~> 3.2, >= 3.2.4)
   lyberteam-capistrano-devel (~> 3.0)
