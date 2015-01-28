@@ -21,17 +21,8 @@ module Robots       # Robot package
           LyberCore::Log.debug "release-publish working on #{druid}"
 
           item = Dor::Release::Item.new :druid => druid
-
-          # TODO Check item's collections tags here or in Dor::Item?
           
-#          collections=item.collections            # gives an array of fedora collection objects for this item
-
-#          item.tags                    # gives us an array of tags
-#          item.add_tag("Key: Value")   # adds a new tag
-#          item.save                    # saves the item
-
-          # TODO define the republish_needed? method on Dor::Item
-          item.object.publish_metadata if item.republish_needed?
+          item.object.publish_metadata # if item.republish_needed?  # assuming you have a "republish_needed?" method on dor-services, which we don't have currently, so just do a pubish for now
                       
         end
       end

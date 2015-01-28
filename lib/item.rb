@@ -18,7 +18,7 @@ module Dor::Release
       unless @members # if members have not been fetched and cached for this object yet, fetch them
 
         handler = Proc.new do |exception, attempt_number, total_delay|
-          LyberCore::Log.debug "#{exception.class} on dor-fetcher-service get members call #{attempt_number} for #{@druid}"
+          LyberCore::Log.debug "#{exception.class} on dor-fetcher-service get members call #{attempt_number} for #{@druid}" if attempt_number >= Dor::Config.release.max_tries
         end
       
         with_retries(:max_tries => Dor::Config.release.max_tries, :handler => handler, :base_sleep_seconds => Dor::Config.release.base_sleep_seconds, :max_sleep_seconds => Dor::Config.release.max_sleep_seconds) do |attempt|
@@ -89,7 +89,7 @@ module Dor::Release
     def self.create_workflow(druid)
     
       handler = Proc.new do |exception, attempt_number, total_delay|
-        LyberCore::Log.debug "#{exception.class} on initialize workflow attempt #{attempt_number} for #{druid}"
+        LyberCore::Log.debug "#{exception.class} on initialize workflow attempt #{attempt_number} for #{druid}" if attempt_number >= Dor::Config.release.max_tries
       end
         
       LyberCore::Log.debug "...adding workflow #{Dor::Config.release.workflow_name} for #{druid}"
@@ -105,7 +105,7 @@ module Dor::Release
     def self.set_release_to_completed(druid)
     
       handler = Proc.new do |exception, attempt_number, total_delay|
-        LyberCore::Log.debug "#{exception.class} on workflow service attempt #{attempt_number} for #{druid}"
+        LyberCore::Log.debug "#{exception.class} on workflow service attempt #{attempt_number} for #{druid}" if attempt_number >= Dor::Config.release.max_tries
       end
         
       LyberCore::Log.debug "...setting release to completed in #{Dor::Config.release.workflow_name} for #{druid}"
