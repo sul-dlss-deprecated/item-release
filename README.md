@@ -39,6 +39,12 @@ If you want to run multiple druids, instead of specifying a single druid with a 
 
 bin/run_robot dor:releaseWF:release-publish -e development -d druid:bb027yn4436
 
+== Deploy
+
+cap development deploy
+cap staging deploy
+cap production deploy
+
 
 
 
