@@ -18,15 +18,12 @@ module Robots
           LyberCore::Log.debug "update_marc working on #{druid}"
           item = Dor::Release::Item.new :druid => druid
           
-          # if we have catkey:
-          #     
-          # else:
-          #     nothing should be done
-          #     return
-                      
+          update_marc_record = Dor::UpdateMarcRecordService.new item
+          if update_marc_record.get_ckey.length > 0 then
+            update_marc_record.push_symphony_record
+          end
         end
       end
-
     end
   end
 end

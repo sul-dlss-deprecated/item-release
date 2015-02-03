@@ -1,53 +1,87 @@
 module Dor
   class UpdateMarcRecordService
     
-    def initalize
+    def initialize druid_obj
+      @druid_obj = druid_obj
+      @druid_id = @druid_obj.id
     end
 
+    def push_symphony_record
+      symphony_record = generate_symphony_record
+      write_symphony_record symphony_record
+    end
     def generate_symphony_record
+      catkey = get_ckey @druid_obj.datastreams["identityMetadata"].ng_xml
+      
+      purl_label = get_z_field
+      purl_uri = get_u_field
+      format_type = get_x2_format_type
+      collection_info = get_x3_collection_info
+      
+      return "#{catkey}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_label}#{purl_uri}#{get_x1_sdrpurl_marker}#{format_type}#{collection_info}"
     end
     
-    def write_symphony_record
-    end
-        
-    def get_ckey #identityMetadataStream
-      # It reads the value form identityMetadata otherkeys 
+    def write_symphony_record symphony_record
+      symphony_file_name = #{Dor::Config.release.symphony_path}/sdr-purl-#{Time.now.strftime("%Y%m%d%H%M%S")}"
+      symphony_file = File.open(symphony_file_name,"w")
+      symphony_file.write(symphony_record)
+      symphony_file.close
     end
 
+    # It extracts catkey from the druid object identityMetadataXML
+    # @param [nokogiri_xml_object] identityMetadataXML -- identityMetadataStream XML for the druid
+    # @return [String] the catkey of the druid object.
+    def get_ckey identityMetadataXML
+      xpath_results = identityMetadataXML.at_xpath('//identityMetadata/otherId[@name="catkey"]')
+      unless  xpath_results.nil? then
+        return xpath_results.content
+      else 
+        return nil
+      end
+    end
+
+    # It returns 856 constants
     def get_856_cons
-      # it is a constant
-      return "856"
+      return ".856."
     end
-
+    
+    # It returns First Indicator for HTTP (4)
     def get_1st_indicator
-      return "1" 
+      return "4" 
     end
-
+    
+    # It returns Second Indicator for Version of resource (1)
     def get_2nd_indicator
-      # ??
+      return "1"
     end
-
+    
+    # It's a plceholder for the uri label 
     def get_z_field
-      # ??
+      #  Placeholder to be used in the future
+    end
+    
+    # It builds the PURL uri based on the druid id
+    def get_u_field 
+      return "|u#{Dor::Config.release.purl_base_uri}/#{@druid_id.sub("druid:","")}"
     end
 
-    def get_u_field #druid_id
-      # It builds it based on purl URI constant. + druid + .xml
-    end
-
+    # It returns the SDR-PURL subfield
     def get_x1_sdrpurl_marker
       return "|xSDR-PURL"
     end
 
-    def get_x2_format_type
-      # ??
-    end
+    # It returns the collection information subfields if exists
+    # @return [String] the colleciton information druid:value:title format
+    def get_x2_collection_info 
+      collections = @druid_obj.collections
 
-    def get_x3_collection_info #druid_obj
-      # It can extracts collection druid if exsits adn then format the collection info subfields based on
-      # collection is member of
-      # collection label from collection_object identityMetadata
-      # druid:aa111aa1111:collectionlabel
+      if collections.length > 0 then
+        collection_title = collections[0].label
+        colleciton_id = collections[0].id
+        return "|x#{colleciton_id}:#{collection_title}"
+      else
+        return ""
+      end
     end
   end
 end
