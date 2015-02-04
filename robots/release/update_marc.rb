@@ -16,10 +16,10 @@ module Robots
         def perform(druid)
 
           LyberCore::Log.debug "update_marc working on #{druid}"
-          item = Dor::Release::Item.new :druid => druid
+          item = Dor::Item.find druid
           
           update_marc_record = Dor::UpdateMarcRecordService.new item
-          if update_marc_record.get_ckey.length > 0 then
+          if update_marc_record.get_ckey(item.datastreams["identityMetadata"].ng_xml).length > 0 then
             update_marc_record.push_symphony_record
           end
         end

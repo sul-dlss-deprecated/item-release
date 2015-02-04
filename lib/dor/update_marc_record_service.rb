@@ -13,6 +13,10 @@ module Dor
     def generate_symphony_record
       catkey = get_ckey @druid_obj.datastreams["identityMetadata"].ng_xml
       
+      if catkey.nil? || catkey.length == 0 then
+        return ""
+      end
+      
       purl_uri = get_u_field
       collection_info = get_x2_collection_info
       
@@ -20,6 +24,9 @@ module Dor
     end
     
     def write_symphony_record symphony_record
+      if symphony_record.nil? || symphony_record.length == 0 then
+        return
+      end
       symphony_file_name = "#{Dor::Config.release.symphony_path}/sdr-purl-#{Time.now.strftime('%Y%m%d%H%M%S')}"
       symphony_file = File.open(symphony_file_name,"w")
       symphony_file.write(symphony_record)
