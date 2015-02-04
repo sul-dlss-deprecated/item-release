@@ -13,16 +13,14 @@ module Dor
     def generate_symphony_record
       catkey = get_ckey @druid_obj.datastreams["identityMetadata"].ng_xml
       
-      purl_label = get_z_field
       purl_uri = get_u_field
-      format_type = get_x2_format_type
-      collection_info = get_x3_collection_info
+      collection_info = get_x2_collection_info
       
-      return "#{catkey}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_label}#{purl_uri}#{get_x1_sdrpurl_marker}#{format_type}#{collection_info}"
+      return "#{catkey}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{collection_info}"
     end
     
     def write_symphony_record symphony_record
-      symphony_file_name = #{Dor::Config.release.symphony_path}/sdr-purl-#{Time.now.strftime("%Y%m%d%H%M%S")}"
+      symphony_file_name = "#{Dor::Config.release.symphony_path}/sdr-purl-#{Time.now.strftime('%Y%m%d%H%M%S')}"
       symphony_file = File.open(symphony_file_name,"w")
       symphony_file.write(symphony_record)
       symphony_file.close

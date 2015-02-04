@@ -2,17 +2,56 @@ require 'spec_helper'
 
 describe Dor::UpdateMarcRecordService do
   
+  before :all do
+    @fixtures = "spec/fixtures/"
+  end
+  
   describe ".push_symphony_record" do
     pending
   end
 
   describe ".generate_symphony_record" do
-    pending
+    it "should generate symphony record for a druid object with catkey" do
+      item=double(Dor::Item.new)
+      collection = double(Dor::Collection.new)
+      identityMetadataXML = double(String)
+      
+      allow(identityMetadataXML).to receive_messages(
+        :ng_xml => Nokogiri::XML(build_identity_metadata_1)
+      )
+      
+      allow(collection).to receive_messages(
+        :label => "Collection label",
+        :id => "druid:cc111cc1111",
+      )
+      
+      allow(item).to receive_messages(
+        :id => "druid:aa111aa1111",
+        :collections =>[collection],
+        :datastreams => {"identityMetadata"=>identityMetadataXML} 
+      )
+      updater = Dor::UpdateMarcRecordService.new(item)
+      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xdruid:cc111cc1111:Collection label")
+    end
+    
+    it "should generate symphony record for a collection object with catkey" do
+      
+    end
   end
 
   describe ".write_symphony_record" do
     it "should write the symphony record to the symphony directory" do
-      
+      d = Dor::Item.new 
+      updater = Dor::UpdateMarcRecordService.new(d)
+      updater.instance_variable_set(:@druid_id,"druid:aa111aa1111")
+      Dor::Config.release.symphony_path = "#{@fixtures}/sdr_purl"
+      updater.write_symphony_record "aaa"
+    
+      expect(File.exists?("#{@fixtures}/sdr_purl/sdr-purl-*"))
+    end
+    
+    after :each do
+      FileUtils.rm_rf("#{@fixtures}/sdr_purl/.")
     end
   end
 
