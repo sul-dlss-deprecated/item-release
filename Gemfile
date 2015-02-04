@@ -10,12 +10,12 @@ gem 'rake', '~> 10.3.2'
 gem 'dor-fetcher'
 gem 'retries'
 gem 'dor-workflow-service'
+gem 'rspec'
 
 group :development do
   if File.exists?(mygems = File.join(ENV['HOME'],'.gemfile'))
     instance_eval(File.read(mygems))
   end
-  gem 'rspec'
   gem 'vcr'
   gem 'coveralls'
   gem 'awesome_print'
