@@ -6,7 +6,7 @@ module Robots
         include LyberCore::Robot 
 
         def initialize
-          super('dor', Dor::Config.release.workflow_name, 'update_marc', check_queued_status: true) # init LyberCore::Robot
+          super('dor', Dor::Config.release.workflow_name, 'update-marc', check_queued_status: true) # init LyberCore::Robot
         end
 
         # `perform` is the main entry point for the robot. This is where
@@ -19,7 +19,7 @@ module Robots
           item = Dor::Item.find druid
           
           update_marc_record = Dor::UpdateMarcRecordService.new item
-          if update_marc_record.get_ckey(item.datastreams["identityMetadata"].ng_xml).length > 0 then
+          unless update_marc_record.get_ckey(item.datastreams["identityMetadata"].ng_xml).nil?  then
             update_marc_record.push_symphony_record
           end
         end
