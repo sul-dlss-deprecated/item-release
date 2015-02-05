@@ -79,7 +79,7 @@ GEM
     dor-fetcher (1.1.7)
       addressable
       rest-client
-    dor-services (4.17.1)
+    dor-services (4.18.0)
       active-fedora (~> 5.7.1)
       activesupport (~> 3.2, >= 3.2.18)
       confstruct (~> 0.2.7)
@@ -292,7 +292,7 @@ DEPENDENCIES
   coveralls
   debugger
   dor-fetcher
-  dor-services (~> 4.17.1)
+  dor-services (>= 4.18, < 5.0)
   dor-workflow-service
   json_pure
   lyber-core (~> 3.2, >= 3.2.4)
