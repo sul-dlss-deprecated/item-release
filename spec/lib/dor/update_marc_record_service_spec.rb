@@ -12,6 +12,8 @@ describe Dor::UpdateMarcRecordService do
 
   describe ".generate_symphony_record" do
     it "should generate symphony record for a druid object with catkey" do
+      Dor::Config.release.purl_base_uri = "http://purl.stanford.edu"
+
       item=double(Dor::Item.new)
       collection = double(Dor::Collection.new)
       identityMetadataXML = double(String)
@@ -35,6 +37,8 @@ describe Dor::UpdateMarcRecordService do
     end
     
     it "should generate symphony record for a collection object with catkey" do
+      Dor::Config.release.purl_base_uri = "http://purl.stanford.edu"
+
       item=double(Dor::Item.new)
       identityMetadataXML = double(String)
       
