@@ -27,7 +27,7 @@ require 'dor-fetcher'
 # TODO Maybe move auto-require to just run_robot and spec_helper?
 
 # Load any library files and all the robots
-Dir["#{ROBOT_ROOT}/lib/*.rb"].each { |f| require f }
+Dir["#{ROBOT_ROOT}/lib/*/*.rb"].each { |f| require f }
 require 'robots'
 
 # Load local environment configuration
