@@ -27,7 +27,7 @@ module Dor
       if symphony_record.nil? || symphony_record.length == 0 then
         return
       end
-      symphony_file_name = "#{Dor::Config.release.symphony_path}/sdr-purl-#{Time.now.strftime('%Y%m%d%H%M%S')}"
+      symphony_file_name = "#{Dor::Config.release.symphony_path}/sdr-purl-#{@druid_id.sub("druid:","")}-#{Time.now.strftime('%Y%m%d%H%M%S')}"
       symphony_file = File.open(symphony_file_name,"w")
       symphony_file.write(symphony_record)
       symphony_file.close

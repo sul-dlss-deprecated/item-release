@@ -66,7 +66,7 @@ describe Dor::UpdateMarcRecordService do
       Dor::Config.release.symphony_path = "#{@fixtures}/sdr_purl"
       updater.write_symphony_record "aaa"
     
-      expect(Dir.glob("#{@fixtures}/sdr_purl/sdr-purl-*").empty?).to be false
+      expect(Dir.glob("#{@fixtures}/sdr_purl/sdr-purl-aa111aa1111-??????????????").empty?).to be false
     end
     
     it "should do nothing if the symphony record is empty" do
@@ -76,7 +76,7 @@ describe Dor::UpdateMarcRecordService do
       Dor::Config.release.symphony_path = "#{@fixtures}/sdr_purl"
       updater.write_symphony_record ""
     
-      expect(Dir.glob("#{@fixtures}/sdr_purl/sdr-purl-*").empty?).to be true
+      expect(Dir.glob("#{@fixtures}/sdr_purl/sdr-purl-aa111aa1111-??????????????").empty?).to be true
     end
   
     it "should do nothing if the symphony record is nil" do
@@ -86,7 +86,7 @@ describe Dor::UpdateMarcRecordService do
       Dor::Config.release.symphony_path = "#{@fixtures}/sdr_purl"
       updater.write_symphony_record ""
     
-      expect(Dir.glob("#{@fixtures}/sdr_purl/sdr-purl-*").empty?).to be true
+      expect(Dir.glob("#{@fixtures}/sdr_purl/sdr-purl-aa111aa1111-??????????????").empty?).to be true
     end
   
     after :each do
