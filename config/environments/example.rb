@@ -27,6 +27,7 @@ Dor::Config.configure do
     base_sleep_seconds  10   # base sleep seconds between tries       
     purl_base_uri 'http://purl.stanford.edu/' 
     symphony_path './'
+    write_marc_script 'bin/write_marc_record_test'
   end
 
   dor do
