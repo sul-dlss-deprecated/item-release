@@ -1,3 +1,5 @@
+require 'open3'
+
 module Dor
   class UpdateMarcRecordService
     
@@ -28,9 +30,20 @@ module Dor
         return
       end
       symphony_file_name = "#{Dor::Config.release.symphony_path}/sdr-purl-#{@druid_id.sub("druid:","")}-#{Time.now.strftime('%Y%m%d%H%M%S')}"
-      system("bin/write_marc_record.sh",symphony_record,symphony_file_name)
+      command = "#{Dor::Config.release.write_marc_script} '#{symphony_record}' #{symphony_file_name}"
+      run_write_script(command)
     end
 
+    def run_write_script(command)
+      Open3.popen3(command) do |stdin, stdout, stderr, wait_thr|
+        stdout_text = stdout.read
+        stderr_text = stderr.read
+        
+        if stdout_text.length > 0 || stderr_text.length > 0 then
+          raise "There was an error in writting marc_record file using the command #{command}\n#{stdout_text}\n#{stderr_text}"
+        end
+      end    
+    end
     # It extracts catkey from the druid object identityMetadataXML
     # @param [nokogiri_xml_object] identityMetadataXML -- identityMetadataStream XML for the druid
     # @return [String] the catkey of the druid object.
