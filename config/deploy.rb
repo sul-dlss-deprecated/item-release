@@ -31,7 +31,7 @@ set :log_level, :info
 # set :pty, true
 
 # Default value for :linked_files is []
-# set :linked_files, %w{config/database.yml}
+set :linked_files, %w{bin/write_marc_record}
 
 # Default value for linked_dirs is []
 # set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
@@ -47,18 +47,13 @@ set :default_stage, "development"
 set :linked_dirs, %w(log run config/environments config/certs)
 
 namespace :deploy do
-  #This is a try to configure a clean install
-  #desc 'Start application'
-  #task :start do
-  #   invoke 'deploy'
-  #  on roles(:app), in: :sequence, wait: 10 do
-  #    within release_path do
-  #      execute :bundle, :install
-  #      execute :bundle, :exec, :controller, :boot
-  #    end
-  #  end
-  #end
-
+  desc 'Make write_marc_record script executable.'
+  task :chnage_script_mode do
+    on roles(:app), in: :sequence, wait: 10 do
+        execute :chmod, "u+x", release_path.join("bin/write_marc_record")
+    end
+  end
+  
   desc 'Restart application'
   task :restart do
     on roles(:app), in: :sequence, wait: 10 do
@@ -78,5 +73,7 @@ namespace :deploy do
   end
 
   after :publishing, :restart
+  after :restart, :chnage_script_mode
+
 
  end
