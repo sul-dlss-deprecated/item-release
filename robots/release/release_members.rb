@@ -17,6 +17,11 @@ module Robots       # Robot package
         #
         # @param [String] druid -- the Druid identifier for the object to process
         def perform(druid)
+
+          handler = Proc.new do |exception, attempt_number, total_delay|
+            LyberCore::Log.debug "#{exception.class} on dor-workflow-service call #{attempt_number} for #{@druid}" if attempt_number >= Dor::Config.release.max_tries
+          end
+
           LyberCore::Log.debug "release-members working on #{druid}"
           
           item = Dor::Release::Item.new :druid => druid
@@ -28,11 +33,19 @@ module Robots       # Robot package
               LyberCore::Log.debug "...fetching members of #{item.object_type}"
               if item.item_members # if there are any members, iterate through and add item workflows (which includes setting the first step to completed)
             
-                item.item_members.each {|item_member| Dor::Release::Item.add_workflow_for_item(item_member['druid'])}
+                item.item_members.each do |item_member| 
+                  with_retries(:max_tries => Dor::Config.release.max_tries, :handler => handler, :base_sleep_seconds => Dor::Config.release.base_sleep_seconds, :max_sleep_seconds => Dor::Config.release.max_sleep_seconds) do |attempt|
+                    Dor::Release::Item.add_workflow_for_item(item_member['druid'])
+                  end
+                end
             
               elsif item.sub_collections # if there are any sub-collections, iterate through and add collection workflows
 
-                  item.sub_collections.each {|sub_collection| Dor::Release::Item.add_workflow_for_collection(sub_collection['druid'])}
+                  item.sub_collections.each do |sub_collection| 
+                    with_retries(:max_tries => Dor::Config.release.max_tries, :handler => handler, :base_sleep_seconds => Dor::Config.release.base_sleep_seconds, :max_sleep_seconds => Dor::Config.release.max_sleep_seconds) do |attempt|
+                      Dor::Release::Item.add_workflow_for_collection(sub_collection['druid'])
+                    end
+                  end
             
               else # no members found
             

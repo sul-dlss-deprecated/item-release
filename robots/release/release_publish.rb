@@ -22,7 +22,7 @@ module Robots       # Robot package
 
           item = Dor::Release::Item.new :druid => druid
           
-          item.object.publish_metadata # if item.republish_needed?  # assuming you have a "republish_needed?" method on dor-services, which we don't have currently, so just do a pubish for now
+          item.object.publish_metadata # if item.republish_needed?  # assuming you have a "republish_needed?" method on dor-services, which we don't have currently, so just do a publish for now
                       
         end
       end
