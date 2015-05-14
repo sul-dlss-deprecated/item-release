@@ -13,8 +13,7 @@ module Dor
       write_symphony_record symphony_record
     end
     def generate_symphony_record
-      catkey = get_ckey @druid_obj.datastreams["identityMetadata"].ng_xml
-      
+
       if catkey.nil? || catkey.length == 0 then
         return ""
       end
@@ -22,7 +21,21 @@ module Dor
       purl_uri = get_u_field
       collection_info = get_x2_collection_info
       
-      return "#{catkey}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{collection_info}"
+      # catkey: the catalog key that associates a DOR object with a specific Symphony record.
+      # .856. 41
+      # Subfield u (required): the full Purl URL
+      # Subfield x #1 (required): The string SDR-PURL as a marker to identify 856 entries managed through DOR
+      # Subfield x #2 (required): Object type (<identityMetadata><objectType>) – item, collection, 
+      #     (future types of sets to describe other aggregations like albums, atlases, etc)
+      # Subfield x #3 (required): The display type of the object.
+      #     use an explicit display type from the object if present (<identityMetadata><displayType>)
+      #     else use the value of the <contentMetadata> "type" attribute if present, e.g., image, book, file
+      #     else use the value “citation"
+      # Subfield x #4 (required): the barcode if known (<identityMetadata><otherId name="barcode">, else null
+      # Subfield x #5 (required): the file-id to be used as thumb if available, else null
+      # Subfield x #6..n (optional): Collection(s) this object is a member of, recorded as druid-value:ckey-value:title
+
+      return "#{catkey}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{object_type}#{collection_info}"
     end
     
     def write_symphony_record symphony_record
@@ -44,15 +57,35 @@ module Dor
         end
       end    
     end
-    # It extracts catkey from the druid object identityMetadataXML
-    # @param [nokogiri_xml_object] identityMetadataXML -- identityMetadataStream XML for the druid
-    # @return [String] the catkey of the druid object.
-    def get_ckey identityMetadataXML
-      xpath_results = identityMetadataXML.at_xpath('//identityMetadata/otherId[@name="catkey"]')
-      unless  xpath_results.nil? then
-        return xpath_results.content
-      else 
-        return nil
+
+    # @return [String] value with SIRSI/Symphony numeric catkey in it, or nil if none exists
+    # look in identityMetadata/otherId[@name='catkey']
+    def catkey
+      @catkey ||= begin
+        catkey = nil
+        node = identity_md.at_xpath("//identityMetadata/otherId[@name='catkey']")
+        catkey = node.content if node
+        if !catkey
+          nil
+        else
+          catkey
+        end
+      end
+    end
+
+    # @return [String] value with object_type in it, or empty x subfield if none exists
+    # look in identityMetadata/objectType
+    def object_type
+      @objectType ||= begin
+        objectType = nil
+        node = identity_md.at_xpath("//identityMetadata/objectType")
+        objectType = node.content if node
+        if !objectType
+          objectType = "|x"
+        else
+          objectType = "|x#{objectType}"
+        end
+        objectType
       end
     end
 
@@ -93,11 +126,23 @@ module Dor
 
       if collections.length > 0 then
         collection_title = collections[0].label
-        colleciton_id = collections[0].id
-        return "|x#{colleciton_id}:#{collection_title}"
+        collection_id = collections[0].id
+        return "|x#{collection_id}:#{collection_title}"
       else
         return ""
       end
+    end
+
+    # the identityMetadata for this object 
+    # @return [Nokogiri::XML::Element] containing the identityMetadata
+    def identity_md
+      @identity_md ||= @druid_obj.datastreams["identityMetadata"].ng_xml
+    end
+
+    # the contentMetadata for this object
+    # @return [Nokogiri::XML::Element] containing the contentMetadata
+    def content_md 
+      @content_md ||= @druid_obj.datastreams["contentMetadata"].ng_xml
     end
   end
 end
