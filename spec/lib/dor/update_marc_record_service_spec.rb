@@ -11,6 +11,30 @@ describe Dor::UpdateMarcRecordService do
   end
 
   describe ".generate_symphony_record" do
+    it "should generate an empty string for a druid object without catkey" do
+      Dor::Config.release.purl_base_uri = "http://purl.stanford.edu"
+
+      item=double(Dor::Item.new)
+      collection = double(Dor::Collection.new)
+      identityMetadataXML = double(String)
+      
+      allow(identityMetadataXML).to receive_messages(
+        :ng_xml => Nokogiri::XML(build_identity_metadata_3)
+      )
+      
+      allow(collection).to receive_messages(
+        :label => "Collection label",
+        :id => "druid:cc111cc1111",
+      )
+      
+      allow(item).to receive_messages(
+        :id => "druid:aa111aa1111",
+        :collections =>[collection],
+        :datastreams => {"identityMetadata"=>identityMetadataXML} 
+      )
+      updater = Dor::UpdateMarcRecordService.new(item)
+      expect(updater.generate_symphony_record).to eq("")
+    end
     it "should generate symphony record for a druid object with catkey" do
       Dor::Config.release.purl_base_uri = "http://purl.stanford.edu"
 
@@ -33,7 +57,7 @@ describe Dor::UpdateMarcRecordService do
         :datastreams => {"identityMetadata"=>identityMetadataXML} 
       )
       updater = Dor::UpdateMarcRecordService.new(item)
-      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xdruid:cc111cc1111:Collection label")
+      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xitem|xdruid:cc111cc1111:Collection label")
     end
     
     it "should generate symphony record for a collection object with catkey" do
@@ -43,7 +67,7 @@ describe Dor::UpdateMarcRecordService do
       identityMetadataXML = double(String)
       
       allow(identityMetadataXML).to receive_messages(
-        :ng_xml => Nokogiri::XML(build_identity_metadata_1)
+        :ng_xml => Nokogiri::XML(build_identity_metadata_2)
       )
       
       allow(item).to receive_messages(
@@ -54,12 +78,12 @@ describe Dor::UpdateMarcRecordService do
        )
      
       updater = Dor::UpdateMarcRecordService.new(item)
-      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL")
+      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection")
     end
   end
 
   describe ".write_symphony_record" do
-    it "should write the symphony record to the symphony directory" do
+    xit "should write the symphony record to the symphony directory" do
       d = Dor::Item.new 
       updater = Dor::UpdateMarcRecordService.new(d)
       updater.instance_variable_set(:@druid_id,"druid:aa111aa1111")
@@ -95,19 +119,75 @@ describe Dor::UpdateMarcRecordService do
     end
   end
 
-  describe ".get_ckey" do
+  describe ".catkey" do
     it "should return catkey from a valid identityMetadata" do
-      identityMetadataXML = Nokogiri::XML(build_identity_metadata_1)
+      identityMetadataXML = double(String)
+      
+      allow(identityMetadataXML).to receive_messages(
+        :ng_xml => Nokogiri::XML(build_identity_metadata_1)
+      )
+      
       d = Dor::Item.new 
+
+      allow(d).to receive_messages(
+        :datastreams => {"identityMetadata"=>identityMetadataXML} 
+      )
+
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.get_ckey identityMetadataXML).to eq("8832162")
+      expect(updater.catkey).to eq("8832162")
     end
     
     it "should return nil for an identityMetadata without catkey" do
-      identityMetadataXML = Nokogiri::XML(build_identity_metadata_2)
+      identityMetadataXML = double(String)
+      
+      allow(identityMetadataXML).to receive_messages(
+        :ng_xml => Nokogiri::XML(build_identity_metadata_3)
+      )
+      
       d = Dor::Item.new 
+
+      allow(d).to receive_messages(
+        :datastreams => {"identityMetadata"=>identityMetadataXML} 
+      )
+
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.get_ckey identityMetadataXML).to be_nil
+      expect(updater.catkey).to be_nil
+    end
+  end
+
+  describe ".object_type" do
+    it "should return object_type from a valid identityMetadata" do
+      identityMetadataXML = double(String)
+      
+      allow(identityMetadataXML).to receive_messages(
+        :ng_xml => Nokogiri::XML(build_identity_metadata_1)
+      )
+      
+      d = Dor::Item.new 
+
+      allow(d).to receive_messages(
+        :datastreams => {"identityMetadata"=>identityMetadataXML} 
+      )
+
+      updater = Dor::UpdateMarcRecordService.new(d)
+      expect(updater.object_type).to eq("|xitem")
+    end
+    
+    it "should return an empty x subfield for an identityMetadata without object_type" do
+      identityMetadataXML = double(String)
+      
+      allow(identityMetadataXML).to receive_messages(
+        :ng_xml => Nokogiri::XML(build_identity_metadata_3)
+      )
+      
+      d = Dor::Item.new 
+
+      allow(d).to receive_messages(
+        :datastreams => {"identityMetadata"=>identityMetadataXML} 
+      )
+
+      updater = Dor::UpdateMarcRecordService.new(d)
+      expect(updater.object_type).to eq("|x")
     end
   end
 
@@ -208,7 +288,24 @@ describe Dor::UpdateMarcRecordService do
   <objectId>druid:bb987ch8177</objectId>
   <objectCreator>DOR</objectCreator>
   <objectLabel>A  new map of Africa</objectLabel>
-  <objectType>item</objectType>
+  <objectType>collection</objectType>
+  <adminPolicy>druid:dd051ys2703</adminPolicy>
+  <otherId name="catkey">8832162</otherId>
+  <otherId name="barcode">36105216275185</otherId>
+  <otherId name="uuid">ff3ce224-9ffb-11e3-aaf2-0050569b3c3c</otherId>
+  <tag>Process : Content Type : Map</tag>
+  <tag>Project : Batchelor Maps : Batch 1</tag>
+  <tag>LAB : MAPS</tag>
+  <tag>Registered By : dfuzzell</tag>
+  <tag>Remediated By : 4.15.4</tag>
+</identityMetadata>'
+  end
+    def build_identity_metadata_3
+    identityMetadataXML = '<identityMetadata>
+  <sourceId source="sul">36105216275185</sourceId>
+  <objectId>druid:bb987ch8177</objectId>
+  <objectCreator>DOR</objectCreator>
+  <objectLabel>A  new map of Africa</objectLabel>
   <adminPolicy>druid:dd051ys2703</adminPolicy>
   <otherId name="barcode">36105216275185</otherId>
   <otherId name="uuid">ff3ce224-9ffb-11e3-aaf2-0050569b3c3c</otherId>
@@ -219,4 +316,5 @@ describe Dor::UpdateMarcRecordService do
   <tag>Remediated By : 4.15.4</tag>
 </identityMetadata>'
   end
+
 end
