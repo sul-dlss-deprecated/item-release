@@ -5,7 +5,7 @@ module Dor
     
     def initialize druid_obj
       @druid_obj = druid_obj
-      @druid_id = @druid_obj.id
+      @druid_id = @druid_obj.id.sub("druid:","")
     end
 
     def push_symphony_record
@@ -20,7 +20,7 @@ module Dor
       
       purl_uri = get_u_field
       collection_info = get_x2_collection_info
-      
+
       # catkey: the catalog key that associates a DOR object with a specific Symphony record.
       # .856. 41
       # Subfield u (required): the full Purl URL
@@ -35,14 +35,14 @@ module Dor
       # Subfield x #5 (required): the file-id to be used as thumb if available, else null
       # Subfield x #6..n (optional): Collection(s) this object is a member of, recorded as druid-value:ckey-value:title
 
-      return "#{catkey}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{object_type}#{collection_info}"
+      return "#{catkey}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{object_type}#{display_type}#{barcode}#{file_ids}#{collection_info}"
     end
     
     def write_symphony_record symphony_record
       if symphony_record.nil? || symphony_record.length == 0 then
         return
       end
-      symphony_file_name = "#{Dor::Config.release.symphony_path}/sdr-purl-#{@druid_id.sub("druid:","")}-#{Time.now.strftime('%Y%m%d%H%M%S')}"
+      symphony_file_name = "#{Dor::Config.release.symphony_path}/sdr-purl-#{@druid_id}-#{Time.now.strftime('%Y%m%d%H%M%S')}"
       command = "#{Dor::Config.release.write_marc_script} '#{symphony_record}' #{symphony_file_name}"
       run_write_script(command)
     end
@@ -65,11 +65,7 @@ module Dor
         catkey = nil
         node = identity_md.at_xpath("//identityMetadata/otherId[@name='catkey']")
         catkey = node.content if node
-        if !catkey
-          nil
-        else
-          catkey
-        end
+        catkey
       end
     end
 
@@ -77,16 +73,52 @@ module Dor
     # look in identityMetadata/objectType
     def object_type
       @objectType ||= begin
-        objectType = nil
+        objectType = ''
         node = identity_md.at_xpath("//identityMetadata/objectType")
         objectType = node.content if node
-        if !objectType
-          objectType = "|x"
-        else
-          objectType = "|x#{objectType}"
-        end
-        objectType
+        objectType.prepend("|x")
       end
+    end
+
+    # value is used to tell SearchWorks UI app of specific display needs for objects
+    # @return [String] identityMetadata displayType, DOR content type, or citation in an x subfield
+    def display_type
+      @displayType ||= begin
+        displayType = ''
+        if node = identity_md.at_xpath("//identityMetadata/displayType")
+          displayType = node.content
+        elsif node = content_md.at_xpath("//contentMetadata/@type")
+          displayType = node.content
+        else
+          if object_type != "|xcollection"
+            displayType = "citation"
+          end
+        end
+        displayType.prepend("|x")
+      end
+    end
+
+    # @return [String] value with barcode in it, or empty x subfield if none exists
+    # look in identityMetadata/otherId name="barcode"
+    def barcode
+      @barcode ||= begin
+        barcode = ''
+        node = identity_md.at_xpath("//identityMetadata/otherId[@name='barcode']")
+        barcode = node.content if node
+        barcode.prepend("|x")
+      end
+    end
+
+    # the @id attribute of resource/file elements that match the display_type, including extension
+    # @return [String] filenames separated by comma
+    def file_ids
+      ids = []
+      if content_md
+        content_md.xpath('//contentMetadata/resource/file').each { |node|
+          ids << node.attr("id") if !node.nil?
+        }
+      end
+      ids.join(',').prepend("|x")
     end
 
     # It returns 856 constants
@@ -111,7 +143,7 @@ module Dor
     
     # It builds the PURL uri based on the druid id
     def get_u_field 
-      return "|u#{Dor::Config.release.purl_base_uri}/#{@druid_id.sub("druid:","")}"
+      return "|u#{Dor::Config.release.purl_base_uri}/#{@druid_id}"
     end
 
     # It returns the SDR-PURL subfield
@@ -120,17 +152,18 @@ module Dor
     end
 
     # It returns the collection information subfields if exists
-    # @return [String] the colleciton information druid:value:title format
+    # @return [String] the colleciton information druid-value:catkey-value:title format
     def get_x2_collection_info 
       collections = @druid_obj.collections
+      coll_info = ""
 
       if collections.length > 0 then
-        collection_title = collections[0].label
-        collection_id = collections[0].id
-        return "|x#{collection_id}:#{collection_title}"
-      else
-        return ""
+        collections.each { |coll|
+          coll_info += "|x#{coll.id}:#{coll.catkey}:#{coll.label}"
+        }
       end
+
+      coll_info
     end
 
     # the identityMetadata for this object 
