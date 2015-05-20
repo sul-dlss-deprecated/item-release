@@ -61,12 +61,10 @@ module Dor
     # @return [String] value with SIRSI/Symphony numeric catkey in it, or nil if none exists
     # look in identityMetadata/otherId[@name='catkey']
     def catkey object
-      @catkey ||= begin
         catkey = nil
         node = object.identityMetadata.ng_xml.at_xpath("//identityMetadata/otherId[@name='catkey']")
         catkey = node.content if node
         catkey
-      end
     end
 
     # @return [String] value with object_type in it, or empty x subfield if none exists
