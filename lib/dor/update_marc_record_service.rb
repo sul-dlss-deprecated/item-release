@@ -60,10 +60,10 @@ module Dor
 
     # @return [String] value with SIRSI/Symphony numeric catkey in it, or nil if none exists
     # look in identityMetadata/otherId[@name='catkey']
-    def catkey
+    def catkey object
       @catkey ||= begin
         catkey = nil
-        node = identity_md.at_xpath("//identityMetadata/otherId[@name='catkey']")
+        node = object.identity_md.at_xpath("//identityMetadata/otherId[@name='catkey']")
         catkey = node.content if node
         catkey
       end
@@ -159,7 +159,7 @@ module Dor
 
       if collections.length > 0 then
         collections.each { |coll|
-          coll_info += "|x#{coll.id}:#{coll.catkey}:#{coll.label}"
+          coll_info += "|x#{coll.id}:#{catkey(coll)}:#{coll.label}"
         }
       end
 
