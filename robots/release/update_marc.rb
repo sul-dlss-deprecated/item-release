@@ -19,7 +19,7 @@ module Robots
           item = Dor::Item.find druid
           
           update_marc_record = Dor::UpdateMarcRecordService.new item
-          unless update_marc_record.get_ckey(item.datastreams["identityMetadata"].ng_xml).nil?  then
+          unless update_marc_record.catkey.nil?  then
             update_marc_record.push_symphony_record
           end
         end
