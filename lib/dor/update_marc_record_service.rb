@@ -14,7 +14,7 @@ module Dor
     end
     def generate_symphony_record
 
-      if catkey.nil? || catkey.length == 0 then
+      if catkey(@druid_obj).nil? || catkey(@druid_obj).length == 0 then
         return ""
       end
       
@@ -35,7 +35,7 @@ module Dor
       # Subfield x #5 (required): the file-id to be used as thumb if available, else null
       # Subfield x #6..n (optional): Collection(s) this object is a member of, recorded as druid-value:ckey-value:title
 
-      return "#{catkey}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{object_type}#{display_type}#{barcode}#{file_ids}#{collection_info}"
+      return "#{catkey(@druid_obj)}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{object_type}#{display_type}#{barcode}#{file_ids}#{collection_info}"
     end
     
     def write_symphony_record symphony_record
