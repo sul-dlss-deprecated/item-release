@@ -63,7 +63,7 @@ module Dor
     def catkey object
       @catkey ||= begin
         catkey = nil
-        node = object.identity_md.at_xpath("//identityMetadata/otherId[@name='catkey']")
+        node = object.identityMetadata.ng_xml.at_xpath("//identityMetadata/otherId[@name='catkey']")
         catkey = node.content if node
         catkey
       end
