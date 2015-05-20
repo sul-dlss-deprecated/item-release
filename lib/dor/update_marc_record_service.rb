@@ -157,7 +157,7 @@ module Dor
 
       if collections.length > 0 then
         collections.each { |coll|
-          coll_info += "|x#{coll.id}:#{catkey(coll)}:#{coll.label}"
+          coll_info += "|x#{coll.id.sub("druid:","")}:#{catkey(coll)}:#{coll.label}"
         }
       end
 
