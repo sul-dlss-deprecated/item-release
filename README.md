@@ -29,7 +29,7 @@ $ cp config/environments/example.rb config/environments/development.rb
 External services are not called in the tests, everything is stubbed out, so you do not need actual connections to things.
 
 ```console
-$ bundle exec rspec spec
+$ bundle exec rake
 ```
 
 ## Testing on the console
