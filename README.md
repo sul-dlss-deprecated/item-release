@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/sul-dlss/item-release.svg?branch=master)](https://travis-ci.org/sul-dlss/item-release)
+[![Dependency Status](https://gemnasium.com/sul-dlss/item-release.svg)](https://gemnasium.com/sul-dlss/item-release)
+
 # Item Release Robot Suite
 
 Robot suite that handles item release and updating PURLs to prepare for indexing.
