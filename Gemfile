@@ -12,12 +12,15 @@ gem 'retries'
 gem 'dor-workflow-service'
 gem 'rspec'
 
+group :development,:test do
+  gem 'coveralls'
+  gem 'vcr'  
+end
+
 group :development do
   if File.exists?(mygems = File.join(ENV['HOME'],'.gemfile'))
     instance_eval(File.read(mygems))
   end
-  gem 'vcr'
-  gem 'coveralls'
   gem 'awesome_print'
   gem 'debugger', :platform => :ruby_19
 	gem 'yard'
@@ -25,6 +28,5 @@ group :development do
   gem 'capistrano-rvm'
   gem 'capistrano-bundler', '~> 1.1'
   gem 'lyberteam-capistrano-devel', "~> 3.0"
- # gem 'holepicker', '~> 0.3', '>= 0.3.3'
   gem 'json_pure'
 end
