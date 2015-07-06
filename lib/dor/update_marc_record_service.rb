@@ -47,7 +47,7 @@ module Dor
       if symphony_record.nil? || symphony_record.length == 0 then
         return
       end
-      symphony_file_name = "#{Dor::Config.release.symphony_path}/sdr-purl-#{@druid_id}-#{Time.now.strftime('%Y%m%d%H%M%S')}"
+      symphony_file_name = "#{Dor::Config.release.symphony_path}/sdr-purl-856s"
       command = "#{Dor::Config.release.write_marc_script} '#{symphony_record}' #{symphony_file_name}"
       run_write_script(command)
     end
