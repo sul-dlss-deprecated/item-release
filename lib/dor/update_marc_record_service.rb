@@ -12,9 +12,11 @@ module Dor
       symphony_record = generate_symphony_record
       write_symphony_record symphony_record
     end
+
     def generate_symphony_record
 
-      if catkey(@druid_obj).nil? || catkey(@druid_obj).length == 0 then
+      druid_ckey = ckey @druid_obj
+      if druid_ckey.nil? || druid_ckey.length == 0 then
         return ""
       end
       
@@ -31,11 +33,14 @@ module Dor
       #     use an explicit display type from the object if present (<identityMetadata><displayType>)
       #     else use the value of the <contentMetadata> "type" attribute if present, e.g., image, book, file
       #     else use the value “citation"
-      # Subfield x #4 (required): the barcode if known (<identityMetadata><otherId name="barcode">, else null
-      # Subfield x #5 (required): the file-id to be used as thumb if available, else null
-      # Subfield x #6..n (optional): Collection(s) this object is a member of, recorded as druid-value:ckey-value:title
+      # Subfield x #4 (optional): the barcode if known (<identityMetadata><otherId name="barcode">, recorded as barcode:barcode-value
+      # Subfield x #5 (optional): the file-id to be used as thumb if available, recorded as file:file-id-value
+      # Subfield x #6..n (optional): Collection(s) this object is a member of, recorded as collection:druid-value:ckey-value:title
 
-      return "#{catkey(@druid_obj)}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{object_type}#{display_type}#{barcode}#{file_ids}#{collection_info}"
+      new856 = "#{druid_ckey}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{object_type}#{display_type}"
+      new856 += "#{barcode}" if !barcode.nil?
+      new856 += "#{file_id}" if !file_id.nil?
+      new856 += "#{collection_info}" if !collection_info.nil?
     end
     
     def write_symphony_record symphony_record
@@ -60,10 +65,12 @@ module Dor
 
     # @return [String] value with SIRSI/Symphony numeric catkey in it, or nil if none exists
     # look in identityMetadata/otherId[@name='catkey']
-    def catkey object
+    def ckey object
         catkey = nil
-        node = object.identityMetadata.ng_xml.at_xpath("//identityMetadata/otherId[@name='catkey']")
-        catkey = node.content if node
+        if object.datastreams["identityMetadata"].ng_xml then
+          node = object.identityMetadata.ng_xml.at_xpath("//identityMetadata/otherId[@name='catkey']")
+          catkey = node.content if !node.nil?
+        end
         catkey
     end
 
@@ -72,8 +79,8 @@ module Dor
     def object_type
       @objectType ||= begin
         objectType = ''
-        node = identity_md.at_xpath("//identityMetadata/objectType")
-        objectType = node.content if node
+        node = @druid_obj.datastreams["identityMetadata"].ng_xml.at_xpath("//identityMetadata/objectType")
+        objectType = node.content if !node.nil?
         objectType.prepend("|x")
       end
     end
@@ -83,9 +90,9 @@ module Dor
     def display_type
       @displayType ||= begin
         displayType = ''
-        if node = identity_md.at_xpath("//identityMetadata/displayType")
+        if node = @druid_obj.datastreams["identityMetadata"].ng_xml.at_xpath("//identityMetadata/displayType")
           displayType = node.content
-        elsif node = content_md.at_xpath("//contentMetadata/@type")
+        elsif node = @druid_obj.datastreams["contentMetadata"].ng_xml.at_xpath("//contentMetadata/@type")
           displayType = node.content
         else
           if object_type != "|xcollection"
@@ -100,23 +107,21 @@ module Dor
     # look in identityMetadata/otherId name="barcode"
     def barcode
       @barcode ||= begin
-        barcode = ''
-        node = identity_md.at_xpath("//identityMetadata/otherId[@name='barcode']")
-        barcode = node.content if node
-        barcode.prepend("|x")
+        barcode = nil
+        node = @druid_obj.datastreams["identityMetadata"].ng_xml.at_xpath("//identityMetadata/otherId[@name='barcode']")
+        barcode = node.content.prepend("|xbarcode:") if !node.nil?
       end
     end
 
     # the @id attribute of resource/file elements that match the display_type, including extension
-    # @return [String] filenames separated by comma
-    def file_ids
-      ids = []
-      if content_md
-        content_md.xpath('//contentMetadata/resource/file').each { |node|
-          ids << node.attr("id") if !node.nil?
-        }
+    # @return [String] first filename
+    def file_id
+      id = nil
+      if @druid_obj.datastreams["contentMetadata"].ng_xml then
+        node = @druid_obj.datastreams["contentMetadata"].ng_xml.xpath('//contentMetadata/resource/file').first
+        id = node.attr("id").prepend("|xfile:") if !node.nil?
       end
-      ids.join(',').prepend("|x")
+      id
     end
 
     # It returns 856 constants
@@ -153,27 +158,15 @@ module Dor
     # @return [String] the colleciton information druid-value:catkey-value:title format
     def get_x2_collection_info 
       collections = @druid_obj.collections
-      coll_info = ""
+      coll_info = nil
 
       if collections.length > 0 then
         collections.each { |coll|
-          coll_info += "|x#{coll.id.sub("druid:","")}:#{catkey(coll)}:#{coll.label}"
+          coll_info += "|xcollection:#{coll.id.sub("druid:","")}:#{ckey(coll)}:#{coll.label}"
         }
       end
 
       coll_info
-    end
-
-    # the identityMetadata for this object 
-    # @return [Nokogiri::XML::Element] containing the identityMetadata
-    def identity_md
-      @identity_md ||= @druid_obj.datastreams["identityMetadata"].ng_xml
-    end
-
-    # the contentMetadata for this object
-    # @return [Nokogiri::XML::Element] containing the contentMetadata
-    def content_md 
-      @content_md ||= @druid_obj.datastreams["contentMetadata"].ng_xml
     end
   end
 end

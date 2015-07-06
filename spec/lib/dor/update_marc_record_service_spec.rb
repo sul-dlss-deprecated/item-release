@@ -14,7 +14,7 @@ describe Dor::UpdateMarcRecordService do
     it "should generate an empty string for a druid object without catkey" do
       Dor::Config.release.purl_base_uri = "http://purl.stanford.edu"
 
-      item=double(Dor::Item.new)
+      item=Dor::Item.new
       collection = double(Dor::Collection.new)
       identityMetadataXML = double(String)
 
@@ -39,8 +39,8 @@ describe Dor::UpdateMarcRecordService do
     it "should generate symphony record for a item object with catkey" do
       Dor::Config.release.purl_base_uri = "http://purl.stanford.edu"
 
-      item=double(Dor::Item.new)
-      collection = double(Dor::Collection.new)
+      item=Dor::Item.new
+      collection = Dor::Collection.new
       identityMetadataXML = double(String)
       contentMetadataXML = double(String)
 
@@ -55,7 +55,6 @@ describe Dor::UpdateMarcRecordService do
       allow(collection).to receive_messages(
         :label => "Collection label",
         :id => "cc111cc1111",
-        :catkey => nil
       )
 
       allow(item).to receive_messages(
@@ -64,7 +63,7 @@ describe Dor::UpdateMarcRecordService do
         :datastreams => {"identityMetadata"=>identityMetadataXML, "contentMetadata"=>contentMetadataXML}
       )
       updater = Dor::UpdateMarcRecordService.new(item)
-      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xitem|ximage|x36105216275185|xwt183gy6220_00_0001.jp2|xcc111cc1111::Collection label")
+      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xitem|ximage|xbarcode:36105216275185|xfile:wt183gy6220_00_0001.jp2|xcollection:cc111cc1111::Collection label")
     end
     
     it "should generate symphony record for a collection object with catkey" do
@@ -90,7 +89,7 @@ describe Dor::UpdateMarcRecordService do
        )
      
       updater = Dor::UpdateMarcRecordService.new(item)
-      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|x|x|xwt183gy6220_00_0001.jp2,wt183gy6220_00_0002.jp2")
+      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|xfile:wt183gy6220_00_0001.jp2")
     end
   end
 
@@ -146,7 +145,7 @@ describe Dor::UpdateMarcRecordService do
       )
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.catkey).to eq("8832162")
+      expect(updater.ckey(d)).to eq("8832162")
     end
     
     it "should return nil for an identityMetadata without catkey" do
@@ -163,7 +162,7 @@ describe Dor::UpdateMarcRecordService do
       )
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.catkey).to be_nil
+      expect(updater.ckey(d)).to be_nil
     end
   end
 
@@ -281,7 +280,7 @@ describe Dor::UpdateMarcRecordService do
       )
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.barcode).to eq("|x36105216275185")
+      expect(updater.barcode).to eq("|xbarcode:36105216275185")
     end
 
     it "should return an empty x subfield for identityMetadata without barcode" do
@@ -302,8 +301,8 @@ describe Dor::UpdateMarcRecordService do
     end
   end
 
-  describe ".file_ids" do
-    it "should return file_ids from a valid contentMetadata" do
+  describe ".file_id" do
+    it "should return file_id from a valid contentMetadata" do
       contentMetadataXML = double(String)
 
       allow(contentMetadataXML).to receive_messages(
@@ -317,10 +316,10 @@ describe Dor::UpdateMarcRecordService do
       )
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.file_ids).to eq("|xwt183gy6220_00_0001.jp2")
+      expect(updater.file_id).to eq("|xfile:wt183gy6220_00_0001.jp2")
     end
 
-    it "should return an empty x subfield for contentMetadata without file_ids" do
+    it "should return an empty x subfield for contentMetadata without file_id" do
       contentMetadataXML = double(String)
 
       allow(contentMetadataXML).to receive_messages(
@@ -334,7 +333,7 @@ describe Dor::UpdateMarcRecordService do
       )
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.file_ids).to eq("|x")
+      expect(updater.file_id).to eq(nil)
     end
   end
 
@@ -384,13 +383,13 @@ describe Dor::UpdateMarcRecordService do
     it "should return an empty string for an object without collection" do
       d = Dor::Item.new 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.get_x2_collection_info).to eq("")
+      expect(updater.get_x2_collection_info).to eq(nil)
     end
 
     it "should return an empty string for a collection object" do
       c = Dor::Collection.new    
       updater = Dor::UpdateMarcRecordService.new(c)
-      expect(updater.get_x2_collection_info).to eq("")
+      expect(updater.get_x2_collection_info).to eq(nil)
     end
 
     it "should return an empty string for a collection object" do
@@ -408,7 +407,7 @@ describe Dor::UpdateMarcRecordService do
         :collections =>[collection],
       )
       updater = Dor::UpdateMarcRecordService.new(item)
-      expect(updater.get_x2_collection_info).to eq("|xcc111cc1111:12345678:Collection label")
+      expect(updater.get_x2_collection_info).to eq("|xcollection:cc111cc1111:12345678:Collection label")
     end
   end
   
