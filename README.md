@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/sul-dlss/item-release.svg?branch=master)](https://travis-ci.org/sul-dlss/item-release)
+[![Dependency Status](https://gemnasium.com/sul-dlss/item-release.svg)](https://gemnasium.com/sul-dlss/item-release)
 
 # Item Release Robot Suite
 
@@ -31,7 +32,7 @@ $ cp config/environments/example.rb config/environments/development.rb
 External services are not called in the tests, everything is stubbed out, so you do not need actual connections to things.
 
 ```console
-$ bundle exec rspec spec
+$ bundle exec rake
 ```
 
 ## Testing on the console
@@ -59,6 +60,3 @@ $ cap development deploy
 $ cap staging deploy
 $ cap production deploy
 ```
-
-
-

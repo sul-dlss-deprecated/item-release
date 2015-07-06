@@ -1,8 +1,8 @@
 notifications:
   email: false
-  
+
 rvm:
-  - 2.1.2
+  - 2.2.2
 
 env:
   global:
@@ -10,9 +10,3 @@ env:
 
 sudo: false
 language: ruby
-cache: bundler
-
-script: bundle exec rake spec 
-
-after_success:
-  coveralls
