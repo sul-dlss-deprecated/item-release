@@ -69,7 +69,7 @@ describe Dor::UpdateMarcRecordService do
     it "should generate symphony record for a collection object with catkey" do
       Dor::Config.release.purl_base_uri = "http://purl.stanford.edu"
 
-      item=double(Dor::Item.new)
+      collection=Dor::Collection.new
       identityMetadataXML = double(String)
       contentMetadataXML = double(String)
       
@@ -81,15 +81,15 @@ describe Dor::UpdateMarcRecordService do
         :ng_xml => Nokogiri::XML(build_content_metadata_2)
       )
 
-      allow(item).to receive_messages(
+      allow(collection).to receive_messages(
         :label => "Collection label",
         :id => "aa111aa1111",
         :collections =>[],
         :datastreams => {"identityMetadata"=>identityMetadataXML, "contentMetadata"=>contentMetadataXML}
        )
      
-      updater = Dor::UpdateMarcRecordService.new(item)
-      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|xfile:wt183gy6220_00_0001.jp2")
+      updater = Dor::UpdateMarcRecordService.new(collection)
+      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|ximage|xfile:wt183gy6220_00_0001.jp2")
     end
   end
 
@@ -383,31 +383,35 @@ describe Dor::UpdateMarcRecordService do
     it "should return an empty string for an object without collection" do
       d = Dor::Item.new 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.get_x2_collection_info).to eq(nil)
+      expect(updater.get_x2_collection_info).to be_empty
     end
 
     it "should return an empty string for a collection object" do
       c = Dor::Collection.new    
       updater = Dor::UpdateMarcRecordService.new(c)
-      expect(updater.get_x2_collection_info).to eq(nil)
+      expect(updater.get_x2_collection_info).to be_empty
     end
 
-    it "should return an empty string for a collection object" do
+    it "should return the appropriate information for a collection object" do
       item=double(Dor::Item.new)
-      collection = double(Dor::Collection.new)
-      
+      collection = Dor::Collection.new
+      identityMetadataXML = String
+
+      allow(identityMetadataXML).to receive_messages(
+        :ng_xml => Nokogiri::XML(build_identity_metadata_2)
+      )
+
       allow(collection).to receive_messages(
         :label => "Collection label",
         :id => "cc111cc1111",
-        :catkey => "12345678"
+        :datastreams => {"identityMetadata"=>identityMetadataXML}
       )
-      
       allow(item).to receive_messages(
         :id => "aa111aa1111",
         :collections =>[collection],
       )
       updater = Dor::UpdateMarcRecordService.new(item)
-      expect(updater.get_x2_collection_info).to eq("|xcollection:cc111cc1111:12345678:Collection label")
+      expect(updater.get_x2_collection_info).to eq("|xcollection:cc111cc1111:8832162:Collection label")
     end
   end
   
@@ -437,6 +441,7 @@ describe Dor::UpdateMarcRecordService do
   <objectCreator>DOR</objectCreator>
   <objectLabel>A  new map of Africa</objectLabel>
   <objectType>collection</objectType>
+  <displayType>image</displayType>
   <adminPolicy>druid:dd051ys2703</adminPolicy>
   <otherId name="catkey">8832162</otherId>
   <otherId name="uuid">ff3ce224-9ffb-11e3-aaf2-0050569b3c3c</otherId>

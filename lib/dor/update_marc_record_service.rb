@@ -158,7 +158,7 @@ module Dor
     # @return [String] the colleciton information druid-value:catkey-value:title format
     def get_x2_collection_info 
       collections = @druid_obj.collections
-      coll_info = nil
+      coll_info = ""
 
       if collections.length > 0 then
         collections.each { |coll|
