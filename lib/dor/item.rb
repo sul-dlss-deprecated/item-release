@@ -4,10 +4,13 @@ module Dor::Release
 
   class Item
   
+    attr_accessor :druid,:fetcher
+    
     def initialize(params = {})
       # Takes a druid, either as a string or as a Druid object.
       @druid = params[:druid]
-      @fetcher = DorFetcher::Client.new({:service_url => Dor::Config.release.fetcher_root})
+      skip_heartbeat = params[:skip_heartbeat] || false
+      @fetcher = DorFetcher::Client.new({:service_url => Dor::Config.release.fetcher_root,:skip_heartbeat=>skip_heartbeat})
     end
 
     def object
@@ -57,7 +60,7 @@ module Dor::Release
       #TODO implement logic here, presumably by calling a method on dor-services-gem
       false
       
-      #LyberCore::Log.debug "republishing metadatra for #{@druid}"
+      #LyberCore::Log.debug "republishing metadata for #{@druid}"
       
     end
     
