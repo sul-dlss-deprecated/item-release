@@ -319,6 +319,3 @@ DEPENDENCIES
   slop (~> 3.5.0)
   vcr
   yard
-
-BUNDLED WITH
-   1.10.3

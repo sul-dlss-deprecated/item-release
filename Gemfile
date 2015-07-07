@@ -13,7 +13,7 @@ gem 'dor-workflow-service'
 gem 'rspec'
 
 group :development,:test do
-  gem 'coveralls'
+  gem 'coveralls', require: false 
   gem 'vcr'  
 end
 
