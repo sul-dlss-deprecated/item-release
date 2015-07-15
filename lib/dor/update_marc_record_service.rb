@@ -48,7 +48,7 @@ module Dor
         return
       end
       symphony_file_name = "#{Dor::Config.release.symphony_path}/sdr-purl-856s"
-      command = "#{Dor::Config.release.write_marc_script} '#{symphony_record}' #{symphony_file_name}"
+      command = "#{Dor::Config.release.write_marc_script} \'#{symphony_record}\' #{symphony_file_name}"
       run_write_script(command)
     end
 
@@ -58,7 +58,7 @@ module Dor
         stderr_text = stderr.read
         
         if stdout_text.length > 0 || stderr_text.length > 0 then
-          raise "There was an error in writting marc_record file using the command #{command}\n#{stdout_text}\n#{stderr_text}"
+          raise "There was an error in writing marc_record file using the command #{command}\n#{stdout_text}\n#{stderr_text}"
         end
       end    
     end
@@ -67,9 +67,11 @@ module Dor
     # look in identityMetadata/otherId[@name='catkey']
     def ckey object
         catkey = nil
-        if object.datastreams["identityMetadata"].ng_xml then
-          node = object.identityMetadata.ng_xml.at_xpath("//identityMetadata/otherId[@name='catkey']")
-          catkey = node.content if !node.nil?
+        unless object.datastreams.nil? || object.datastreams["identityMetadata"].nil? then
+          if object.datastreams["identityMetadata"].ng_xml then
+            node = object.identityMetadata.ng_xml.at_xpath("//identityMetadata/otherId[@name='catkey']")
+            catkey = node.content if !node.nil?
+          end
         end
         catkey
     end
@@ -117,9 +119,11 @@ module Dor
     # @return [String] first filename
     def file_id
       id = nil
-      if @druid_obj.datastreams["contentMetadata"].ng_xml then
-        node = @druid_obj.datastreams["contentMetadata"].ng_xml.xpath('//contentMetadata/resource/file').first
-        id = node.attr("id").prepend("|xfile:") if !node.nil?
+      unless @druid_obj.datastreams.nil? || @druid_obj.datastreams["contentMetadata"].nil? then
+        if @druid_obj.datastreams["contentMetadata"].ng_xml then
+          node = @druid_obj.datastreams["contentMetadata"].ng_xml.xpath('//contentMetadata/resource/file').first
+          id = node.attr("id").prepend("|xfile:") if !node.nil?
+        end
       end
       id
     end
