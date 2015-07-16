@@ -15,3 +15,4 @@ config/environments/production.rb
 .DS_Store
 .ruby-version
 .ruby-gemset
+spec/fixtures
