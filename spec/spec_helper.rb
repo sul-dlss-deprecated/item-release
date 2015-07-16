@@ -20,6 +20,7 @@ def setup_release_item(druid,obj_type,item_members=nil)
   @dor_item=double(Dor::Item)
   allow(@dor_item).to receive_messages(
     :publish_metadata=>nil,
+    :id=>druid
       )
   allow(@release_item).to receive_messages(
       :druid=>druid,
