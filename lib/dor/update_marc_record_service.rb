@@ -58,7 +58,7 @@ module Dor
         stderr_text = stderr.read
         
         if stdout_text.length > 0 || stderr_text.length > 0 then
-          raise "There was an error in writing marc_record file using the command #{command}\n#{stdout_text}\n#{stderr_text}"
+          raise "Error in writing marc_record file using the command #{command}\n#{stdout_text}\n#{stderr_text}"
         end
       end    
     end

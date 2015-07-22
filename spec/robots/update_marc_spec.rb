@@ -13,32 +13,36 @@ describe Robots::DorRepo::Release::UpdateMarc do
     @umr = Robots::DorRepo::Release::UpdateMarc.new 
   end  
 
-  it "runs the robot for a druid without a catkey and do nothing as a result" do
-    setup_release_item(@druid,:item)
-    umrs=Dor::UpdateMarcRecordService.new @dor_item
-    allow(Dor::Item).to receive(:find).with(@druid).and_return(@dor_item)
-    allow(umrs).to receive(:ckey).with(@dor_item).and_return(:nil)
-    expect(@dor_item).to receive(:datastreams).with(no_args)
-    expect(umrs).not_to receive(:push_symphony_record)
-    @umr.perform(@druid)
+  context "for a druid without a catkey" do
+    it 'does nothing' do
+      setup_release_item(@druid,:item)
+      umrs=Dor::UpdateMarcRecordService.new @dor_item
+      allow(Dor::Item).to receive(:find).with(@druid).and_return(@dor_item)
+      allow(umrs).to receive(:ckey).with(@dor_item).and_return(:nil)
+      expect(@dor_item).to receive(:datastreams).with(no_args)
+      expect(umrs).not_to receive(:push_symphony_record)
+      @umr.perform(@druid)
+    end
   end
-  
-  it "runs the robot for a druid with a catkey and execute the UpdateMarcRecordService push_symphony_record method" do
-    identityMetadataXML = Dor::IdentityMetadataDS.new
-    allow(identityMetadataXML).to receive_messages(
-      :ng_xml => Nokogiri::XML(build_identity_metadata_1)
-    )
-    dor_item=Dor::Item.new
-    allow(dor_item).to receive_messages(
-      :id=>@druid,
-      :datastreams => {"identityMetadata"=>identityMetadataXML}
-    )
-    umrs=Dor::UpdateMarcRecordService.new dor_item
-    allow(Dor::UpdateMarcRecordService).to receive_messages(:new=>umrs)
-    allow(Dor::Item).to receive(:find).with(@druid).and_return(dor_item)
-    allow(umrs).to receive(:ckey).with(dor_item).and_return('8832162')
-    expect(umrs).to receive(:push_symphony_record)
-    @umr.perform(@druid)
+
+  context "for a druid with a catkey" do
+    it "Executes the UpdateMarcRecordService push_symphony_record method" do
+      identityMetadataXML = Dor::IdentityMetadataDS.new
+      allow(identityMetadataXML).to receive_messages(
+        :ng_xml => Nokogiri::XML(build_identity_metadata_1)
+      )
+      dor_item=Dor::Item.new
+      allow(dor_item).to receive_messages(
+        :id=>@druid,
+        :datastreams => {"identityMetadata"=>identityMetadataXML}
+      )
+      umrs=Dor::UpdateMarcRecordService.new dor_item
+      allow(Dor::UpdateMarcRecordService).to receive_messages(:new=>umrs)
+      allow(Dor::Item).to receive(:find).with(@druid).and_return(dor_item)
+      allow(umrs).to receive(:ckey).with(dor_item).and_return('8832162')
+      expect(umrs).to receive(:push_symphony_record)
+      @umr.perform(@druid)
+    end
   end
 end
 
