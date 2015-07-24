@@ -24,7 +24,7 @@ group :development do
   gem 'awesome_print'
   gem 'debugger', :platform => :ruby_19
 	gem 'yard'
-	gem 'capistrano', '~> 3.2.1'
+	gem 'capistrano', '>= 3.2.1'
   gem 'capistrano-rvm'
   gem 'capistrano-bundler', '~> 1.1'
   gem 'lyberteam-capistrano-devel', "~> 3.0"
