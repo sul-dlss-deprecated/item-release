@@ -298,7 +298,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  addressable (= 2.3.5)
+  addressable (= 2.3.8)
   awesome_print
   capistrano (~> 3.2.1)
   capistrano-bundler (~> 1.1)
