@@ -63,7 +63,7 @@ describe Dor::UpdateMarcRecordService do
         :datastreams => {"identityMetadata"=>identityMetadataXML, "contentMetadata"=>contentMetadataXML}
       )
       updater = Dor::UpdateMarcRecordService.new(item)
-      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xitem|ximage|xbarcode:36105216275185|xfile:wt183gy6220_00_0001.jp2|xcollection:cc111cc1111::Collection label")
+      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xitem|ximage|xbarcode:36105216275185|xfile:wt183gy6220_00_0001|xcollection:cc111cc1111::Collection label")
     end
     
     it "should generate symphony record for a collection object with catkey" do
@@ -89,7 +89,7 @@ describe Dor::UpdateMarcRecordService do
        )
      
       updater = Dor::UpdateMarcRecordService.new(collection)
-      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|ximage|xfile:wt183gy6220_00_0001.jp2")
+      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|ximage|xfile:wt183gy6220_00_0001")
     end
   end
 
@@ -316,7 +316,7 @@ describe Dor::UpdateMarcRecordService do
       )
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.file_id).to eq("|xfile:wt183gy6220_00_0001.jp2")
+      expect(updater.file_id).to eq("|xfile:wt183gy6220_00_0001")
     end
 
     it "should return an empty x subfield for contentMetadata without file_id" do

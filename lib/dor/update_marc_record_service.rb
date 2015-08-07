@@ -125,6 +125,7 @@ module Dor
           id = node.attr("id").prepend("|xfile:") if !node.nil?
         end
       end
+      id = id.split(/\./).first if !id.nil?
       id
     end
 
