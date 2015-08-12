@@ -89,7 +89,8 @@ describe Dor::UpdateMarcRecordService do
        )
      
       updater = Dor::UpdateMarcRecordService.new(collection)
-      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|ximage|xfile:wt183gy6220_00_0001")
+#      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|ximage|xfile:wt183gy6220_00_0001")
+      expect(updater.generate_symphony_record).to eq("8832162\t")
     end
   end
 
@@ -414,9 +415,24 @@ describe Dor::UpdateMarcRecordService do
       expect(updater.get_x2_collection_info).to eq("|xcollection:cc111cc1111:8832162:Collection label")
     end
   end
-  
+
+  describe "Released to Searchworks" do
+    it "should return true if releaseData tag has release to=SW and value is true" do
+      identityMetadataXML = double("Identity Metadata", ng_xml: Nokogiri::XML(build_identity_metadata_1))
+      dor_item = double("Dor Item", id: "aa111aa1111", identityMetadata: identityMetadataXML)
+      updater = Dor::UpdateMarcRecordService.new(dor_item)
+      expect(updater.released_to_Searchworks(dor_item)).to be true
+    end
+    it "should return false if releaseData tag has release to=SW and value is false" do
+      identityMetadataXML = double("Identity Metadata", ng_xml: Nokogiri::XML(build_identity_metadata_2))
+      dor_item = double("Dor Item", id: "aa111aa1111", identityMetadata: identityMetadataXML)
+      updater = Dor::UpdateMarcRecordService.new(dor_item)
+      expect(updater.released_to_Searchworks(dor_item)).to be false
+    end
+  end
+
   def build_identity_metadata_1
-    identityMetadataXML = '<identityMetadata>
+    '<identityMetadata>
   <sourceId source="sul">36105216275185</sourceId>
   <objectId>druid:bb987ch8177</objectId>
   <objectCreator>DOR</objectCreator>
@@ -432,10 +448,11 @@ describe Dor::UpdateMarcRecordService do
   <tag>LAB : MAPS</tag>
   <tag>Registered By : dfuzzell</tag>
   <tag>Remediated By : 4.15.4</tag>
+  <release to="SearchWorks">true</release>
 </identityMetadata>'
   end
   def build_identity_metadata_2
-    identityMetadataXML = '<identityMetadata>
+    '<identityMetadata>
   <sourceId source="sul">36105216275185</sourceId>
   <objectId>druid:bb987ch8177</objectId>
   <objectCreator>DOR</objectCreator>
@@ -450,10 +467,11 @@ describe Dor::UpdateMarcRecordService do
   <tag>LAB : MAPS</tag>
   <tag>Registered By : dfuzzell</tag>
   <tag>Remediated By : 4.15.4</tag>
+  <release to="SearchWorks">false</release>
 </identityMetadata>'
   end
   def build_identity_metadata_3
-    identityMetadataXML = '<identityMetadata>
+    '<identityMetadata>
   <sourceId source="sul">36105216275185</sourceId>
   <objectId>druid:bb987ch8177</objectId>
   <objectCreator>DOR</objectCreator>
@@ -469,7 +487,7 @@ describe Dor::UpdateMarcRecordService do
   end
 
   def build_content_metadata_1
-    contentMetadataXML = '<contentMetadata objectId="wt183gy6220" type="map">
+    '<contentMetadata objectId="wt183gy6220" type="map">
 <resource id="wt183gy6220_1" sequence="1" type="image">
 <label>Image 1</label>
 <file id="wt183gy6220_00_0001.jp2" mimetype="image/jp2" size="3182927">
@@ -479,7 +497,7 @@ describe Dor::UpdateMarcRecordService do
 </contentMetadata>'
   end
   def build_content_metadata_2
-    contentMetadataXML = '<contentMetadata objectId="wt183gy6220">
+    '<contentMetadata objectId="wt183gy6220">
 <resource id="wt183gy6220_1" sequence="1" type="image">
 <label>Image 1</label>
 <file id="wt183gy6220_00_0001.jp2" mimetype="image/jp2" size="3182927">
@@ -494,8 +512,8 @@ describe Dor::UpdateMarcRecordService do
 </resource>
 </contentMetadata>'
   end
-    def build_content_metadata_3
-    contentMetadataXML = '<contentMetadata objectId="wt183gy6220">
+  def build_content_metadata_3
+    '<contentMetadata objectId="wt183gy6220">
 </contentMetadata>'
   end
 end

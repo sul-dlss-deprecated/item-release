@@ -20,27 +20,33 @@ module Dor
         return ""
       end
       
-      purl_uri = get_u_field
-      collection_info = get_x2_collection_info
+      released = released_to_Searchworks @druid_obj
+      if released then
+        purl_uri = get_u_field
+        collection_info = get_x2_collection_info
 
-      # catkey: the catalog key that associates a DOR object with a specific Symphony record.
-      # .856. 41
-      # Subfield u (required): the full Purl URL
-      # Subfield x #1 (required): The string SDR-PURL as a marker to identify 856 entries managed through DOR
-      # Subfield x #2 (required): Object type (<identityMetadata><objectType>) – item, collection, 
-      #     (future types of sets to describe other aggregations like albums, atlases, etc)
-      # Subfield x #3 (required): The display type of the object.
-      #     use an explicit display type from the object if present (<identityMetadata><displayType>)
-      #     else use the value of the <contentMetadata> "type" attribute if present, e.g., image, book, file
-      #     else use the value “citation"
-      # Subfield x #4 (optional): the barcode if known (<identityMetadata><otherId name="barcode">, recorded as barcode:barcode-value
-      # Subfield x #5 (optional): the file-id to be used as thumb if available, recorded as file:file-id-value
-      # Subfield x #6..n (optional): Collection(s) this object is a member of, recorded as collection:druid-value:ckey-value:title
+        # catkey: the catalog key that associates a DOR object with a specific Symphony record.
+        # .856. 41
+        # Subfield u (required): the full Purl URL
+        # Subfield x #1 (required): The string SDR-PURL as a marker to identify 856 entries managed through DOR
+        # Subfield x #2 (required): Object type (<identityMetadata><objectType>) – item, collection, 
+        #     (future types of sets to describe other aggregations like albums, atlases, etc)
+        # Subfield x #3 (required): The display type of the object.
+        #     use an explicit display type from the object if present (<identityMetadata><displayType>)
+        #     else use the value of the <contentMetadata> "type" attribute if present, e.g., image, book, file
+        #     else use the value “citation"
+        # Subfield x #4 (optional): the barcode if known (<identityMetadata><otherId name="barcode">, recorded as barcode:barcode-value
+        # Subfield x #5 (optional): the file-id to be used as thumb if available, recorded as file:file-id-value
+        # Subfield x #6..n (optional): Collection(s) this object is a member of, recorded as collection:druid-value:ckey-value:title
 
-      new856 = "#{druid_ckey}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{object_type}#{display_type}"
-      new856 += "#{barcode}" if !barcode.nil?
-      new856 += "#{file_id}" if !file_id.nil?
-      new856 += "#{collection_info}" if !collection_info.nil?
+        new856 = "#{druid_ckey}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{object_type}#{display_type}"
+        new856 += "#{barcode}" if !barcode.nil?
+        new856 += "#{file_id}" if !file_id.nil?
+        new856 += "#{collection_info}" if !collection_info.nil?
+      else
+        new856 = "#{druid_ckey}\t"
+      end
+      new856
     end
     
     def write_symphony_record symphony_record
@@ -173,5 +179,11 @@ module Dor
 
       coll_info
     end
+
+    def released_to_Searchworks object
+      node = object.identityMetadata.ng_xml.at_xpath("//identityMetadata/release[@to='SearchWorks']")
+      node && node.content == 'true'
+    end
+
   end
 end
