@@ -2,7 +2,7 @@ require 'open3'
 
 module Dor
   class UpdateMarcRecordService
-    
+
     def initialize druid_obj
       @druid_obj = druid_obj
       @druid_id = @druid_obj.id.sub("druid:","")
@@ -16,12 +16,9 @@ module Dor
     def generate_symphony_record
 
       druid_ckey = ckey @druid_obj
-      if druid_ckey.nil? || druid_ckey.length == 0 then
-        return ""
-      end
-      
-      released = released_to_Searchworks @druid_obj
-      if released then
+      return "" unless druid_ckey.present?
+
+      if released_to_Searchworks
         purl_uri = get_u_field
         collection_info = get_x2_collection_info
 
@@ -29,7 +26,7 @@ module Dor
         # .856. 41
         # Subfield u (required): the full Purl URL
         # Subfield x #1 (required): The string SDR-PURL as a marker to identify 856 entries managed through DOR
-        # Subfield x #2 (required): Object type (<identityMetadata><objectType>) – item, collection, 
+        # Subfield x #2 (required): Object type (<identityMetadata><objectType>) – item, collection,
         #     (future types of sets to describe other aggregations like albums, atlases, etc)
         # Subfield x #3 (required): The display type of the object.
         #     use an explicit display type from the object if present (<identityMetadata><displayType>)
@@ -40,15 +37,15 @@ module Dor
         # Subfield x #6..n (optional): Collection(s) this object is a member of, recorded as collection:druid-value:ckey-value:title
 
         new856 = "#{druid_ckey}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{object_type}#{display_type}"
-        new856 += "#{barcode}" if !barcode.nil?
-        new856 += "#{file_id}" if !file_id.nil?
-        new856 += "#{collection_info}" if !collection_info.nil?
+        new856 << barcode unless barcode.nil?
+        new856 << file_id unless file_id.nil?
+        new856 << collection_info unless collection_info.nil?
+        new856
       else
-        new856 = "#{druid_ckey}\t"
+        "#{druid_ckey}\t"
       end
-      new856
     end
-    
+
     def write_symphony_record symphony_record
       if symphony_record.nil? || symphony_record.length == 0 then
         return
@@ -62,30 +59,28 @@ module Dor
       Open3.popen3(command) do |stdin, stdout, stderr, wait_thr|
         stdout_text = stdout.read
         stderr_text = stderr.read
-        
+
         if stdout_text.length > 0 || stderr_text.length > 0 then
           raise "Error in writing marc_record file using the command #{command}\n#{stdout_text}\n#{stderr_text}"
         end
-      end    
+      end
     end
 
     # @return [String] value with SIRSI/Symphony numeric catkey in it, or nil if none exists
     # look in identityMetadata/otherId[@name='catkey']
     def ckey object
-        catkey = nil
-        unless object.datastreams.nil? || object.datastreams["identityMetadata"].nil? then
-          if object.datastreams["identityMetadata"].ng_xml then
-            node = object.identityMetadata.ng_xml.at_xpath("//identityMetadata/otherId[@name='catkey']")
-            catkey = node.content if !node.nil?
-          end
+      unless object.datastreams.nil? || object.datastreams["identityMetadata"].nil?
+        if object.datastreams["identityMetadata"].ng_xml
+          node = object.identityMetadata.ng_xml.at_xpath("//identityMetadata/otherId[@name='catkey']")
         end
-        catkey
+      end
+      node.content if node && node.content.present?
     end
 
     # @return [String] value with object_type in it, or empty x subfield if none exists
     # look in identityMetadata/objectType
     def object_type
-      @objectType ||= begin
+      @object_type ||= begin
         objectType = ''
         node = @druid_obj.datastreams["identityMetadata"].ng_xml.at_xpath("//identityMetadata/objectType")
         objectType = node.content if !node.nil?
@@ -96,7 +91,7 @@ module Dor
     # value is used to tell SearchWorks UI app of specific display needs for objects
     # @return [String] identityMetadata displayType, DOR content type, or citation in an x subfield
     def display_type
-      @displayType ||= begin
+      @display_type ||= begin
         displayType = ''
         if node = @druid_obj.datastreams["identityMetadata"].ng_xml.at_xpath("//identityMetadata/displayType")
           displayType = node.content
@@ -137,51 +132,51 @@ module Dor
 
     # It returns 856 constants
     def get_856_cons
-      return ".856."
+      ".856."
     end
-    
+
     # It returns First Indicator for HTTP (4)
     def get_1st_indicator
-      return "4" 
+      "4"
     end
-    
+
     # It returns Second Indicator for Version of resource (1)
     def get_2nd_indicator
-      return "1"
+      "1"
     end
-    
-    # It's a plceholder for the uri label 
+
+    # It's a plceholder for the uri label
     def get_z_field
       #  Placeholder to be used in the future
     end
-    
+
     # It builds the PURL uri based on the druid id
-    def get_u_field 
-      return "|u#{Dor::Config.release.purl_base_uri}/#{@druid_id}"
+    def get_u_field
+      "|u#{Dor::Config.release.purl_base_uri}/#{@druid_id}"
     end
 
     # It returns the SDR-PURL subfield
     def get_x1_sdrpurl_marker
-      return "|xSDR-PURL"
+      "|xSDR-PURL"
     end
 
     # It returns the collection information subfields if exists
-    # @return [String] the colleciton information druid-value:catkey-value:title format
-    def get_x2_collection_info 
+    # @return [String] the collection information druid-value:catkey-value:title format
+    def get_x2_collection_info
       collections = @druid_obj.collections
       coll_info = ""
 
       if collections.length > 0 then
         collections.each { |coll|
-          coll_info += "|xcollection:#{coll.id.sub("druid:","")}:#{ckey(coll)}:#{coll.label}"
+          coll_info << "|xcollection:#{coll.id.sub("druid:","")}:#{ckey(coll)}:#{coll.label}"
         }
       end
 
       coll_info
     end
 
-    def released_to_Searchworks object
-      node = object.identityMetadata.ng_xml.at_xpath("//identityMetadata/release[@to='SearchWorks']")
+    def released_to_Searchworks
+      node = @druid_obj.identityMetadata.ng_xml.at_xpath("//identityMetadata/release[@to='SearchWorks']")
       node && node.content == 'true'
     end
 
