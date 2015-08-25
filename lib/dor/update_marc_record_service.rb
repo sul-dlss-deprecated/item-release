@@ -181,7 +181,7 @@ module Dor
     end
 
     def released_to_Searchworks object
-      node = object.identityMetadata.ng_xml.at_xpath("//identityMetadata/release[@to='SearchWorks']")
+      node = object.identityMetadata.ng_xml.at_xpath("//identityMetadata/release[@to='Searchworks']")
       node && node.content == 'true'
     end
 
