@@ -175,8 +175,8 @@ module Dor
       coll_info
     end
 
-    def released_to_Searchworks
-      node = @druid_obj.identityMetadata.ng_xml.at_xpath("//identityMetadata/release[@to='SearchWorks']")
+    def released_to_Searchworks object
+      node = object.identityMetadata.ng_xml.at_xpath("//identityMetadata/release[@to='Searchworks']")
       node && node.content == 'true'
     end
 

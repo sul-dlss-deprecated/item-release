@@ -447,8 +447,8 @@ describe Dor::UpdateMarcRecordService do
   <tag>Project : Batchelor Maps : Batch 1</tag>
   <tag>LAB : MAPS</tag>
   <tag>Registered By : dfuzzell</tag>
-  <tag>Remediated By : 4.15.4</tag>
-  <release to="SearchWorks">true</release>
+  <tag>Remediated By : 4.15</tag>
+  <release to="Searchworks">true</release>
 </identityMetadata>'
   end
   def build_identity_metadata_2
@@ -467,7 +467,7 @@ describe Dor::UpdateMarcRecordService do
   <tag>LAB : MAPS</tag>
   <tag>Registered By : dfuzzell</tag>
   <tag>Remediated By : 4.15.4</tag>
-  <release to="SearchWorks">false</release>
+  <release to="Searchworks">false</release>
 </identityMetadata>'
   end
   def build_identity_metadata_3
@@ -483,6 +483,26 @@ describe Dor::UpdateMarcRecordService do
   <tag>LAB : MAPS</tag>
   <tag>Registered By : dfuzzell</tag>
   <tag>Remediated By : 4.15.4</tag>
+</identityMetadata>'
+  end
+  def build_identity_metadata_4
+    '<identityMetadata>
+  <sourceId source="sul">36105216275185</sourceId>
+  <objectId>druid:bb987ch8177</objectId>
+  <objectCreator>DOR</objectCreator>
+  <objectLabel>A  new map of Africa</objectLabel>
+  <objectType>item</objectType>
+  <displayType>image</displayType>
+  <adminPolicy>druid:dd051ys2703</adminPolicy>
+  <otherId name="catkey">8832162</otherId>
+  <otherId name="barcode">36105216275185</otherId>
+  <otherId name="uuid">ff3ce224-9ffb-11e3-aaf2-0050569b3c3c</otherId>
+  <tag>Process : Content Type : Map</tag>
+  <tag>Project : Batchelor Maps : Batch 1</tag>
+  <tag>LAB : MAPS</tag>
+  <tag>Registered By : dfuzzell</tag>
+  <tag>Remediated By : 4.1</tag>
+  <release to="Searchworks">false</release>
 </identityMetadata>'
   end
 
