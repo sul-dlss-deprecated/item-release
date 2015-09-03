@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 describe Dor::UpdateMarcRecordService do
-  
+
   before :all do
     @fixtures = "./spec/fixtures"
   end
-  
+
   describe ".push_symphony_record" do
     pending
   end
@@ -65,14 +65,14 @@ describe Dor::UpdateMarcRecordService do
       updater = Dor::UpdateMarcRecordService.new(item)
       expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xitem|ximage|xbarcode:36105216275185|xfile:wt183gy6220_00_0001|xcollection:cc111cc1111::Collection label")
     end
-    
+
     it "should generate symphony record for a collection object with catkey" do
       Dor::Config.release.purl_base_uri = "http://purl.stanford.edu"
 
       collection=Dor::Collection.new
       identityMetadataXML = double(String)
       contentMetadataXML = double(String)
-      
+
       allow(identityMetadataXML).to receive_messages(
         :ng_xml => Nokogiri::XML(build_identity_metadata_2)
       )
@@ -87,7 +87,7 @@ describe Dor::UpdateMarcRecordService do
         :collections =>[],
         :datastreams => {"identityMetadata"=>identityMetadataXML, "contentMetadata"=>contentMetadataXML}
        )
-     
+
       updater = Dor::UpdateMarcRecordService.new(collection)
 #      expect(updater.generate_symphony_record).to eq("8832162\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|ximage|xfile:wt183gy6220_00_0001")
       expect(updater.generate_symphony_record).to eq("8832162\t")
@@ -96,36 +96,36 @@ describe Dor::UpdateMarcRecordService do
 
   describe ".write_symphony_record" do
     xit "should write the symphony record to the symphony directory" do
-      d = Dor::Item.new 
+      d = Dor::Item.new
       updater = Dor::UpdateMarcRecordService.new(d)
       updater.instance_variable_set(:@druid_id,"aa111aa1111")
       Dor::Config.release.symphony_path = "#{@fixtures}/sdr-purl"
       Dor::Config.release.write_marc_script = "bin/write_marc_record_test"
       updater.write_symphony_record "aaa"
-      
+
       expect(Dir.glob("#{@fixtures}/sdr-purl/sdr-purl-aa111aa1111-??????????????").empty?).to be false
-   end    
-    
+   end
+
     it "should do nothing if the symphony record is empty" do
-      d = Dor::Item.new 
+      d = Dor::Item.new
       updater = Dor::UpdateMarcRecordService.new(d)
       updater.instance_variable_set(:@druid_id,"aa111aa1111")
       Dor::Config.release.symphony_path = "#{@fixtures}/sdr-purl"
       updater.write_symphony_record ""
-      
+
       expect(Dir.glob("#{@fixtures}/sdr-purl/sdr-purl-aa111aa1111-??????????????").empty?).to be true
     end
-  
+
     it "should do nothing if the symphony record is nil" do
-      d = Dor::Item.new 
+      d = Dor::Item.new
       updater = Dor::UpdateMarcRecordService.new(d)
       updater.instance_variable_set(:@druid_id,"aa111aa1111")
       Dor::Config.release.symphony_path = "#{@fixtures}/sdr-purl"
       updater.write_symphony_record ""
-    
+
       expect(Dir.glob("#{@fixtures}/sdr-purl/sdr-purl-aa111aa1111-??????????????").empty?).to be true
     end
-  
+
     after :each do
       FileUtils.rm_rf("#{@fixtures}/sdr-purl/.")
     end
@@ -134,32 +134,32 @@ describe Dor::UpdateMarcRecordService do
   describe ".catkey" do
     it "should return catkey from a valid identityMetadata" do
       identityMetadataXML = double(String)
-      
+
       allow(identityMetadataXML).to receive_messages(
         :ng_xml => Nokogiri::XML(build_identity_metadata_1)
       )
-      
-      d = Dor::Item.new 
+
+      d = Dor::Item.new
 
       allow(d).to receive_messages(
-        :datastreams => {"identityMetadata"=>identityMetadataXML} 
+        :datastreams => {"identityMetadata"=>identityMetadataXML}
       )
 
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.ckey(d)).to eq("8832162")
     end
-    
+
     it "should return nil for an identityMetadata without catkey" do
       identityMetadataXML = double(String)
-      
+
       allow(identityMetadataXML).to receive_messages(
         :ng_xml => Nokogiri::XML(build_identity_metadata_3)
       )
-      
-      d = Dor::Item.new 
+
+      d = Dor::Item.new
 
       allow(d).to receive_messages(
-        :datastreams => {"identityMetadata"=>identityMetadataXML} 
+        :datastreams => {"identityMetadata"=>identityMetadataXML}
       )
 
       updater = Dor::UpdateMarcRecordService.new(d)
@@ -184,7 +184,7 @@ describe Dor::UpdateMarcRecordService do
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.object_type).to eq("|xitem")
     end
-    
+
     it "should return an empty x subfield for identityMetadata without object_type" do
       identityMetadataXML = double(String)
 
@@ -286,15 +286,15 @@ describe Dor::UpdateMarcRecordService do
 
     it "should return an empty x subfield for identityMetadata without barcode" do
       identityMetadataXML = double(String)
-      
+
       allow(identityMetadataXML).to receive_messages(
         :ng_xml => Nokogiri::XML(build_identity_metadata_3)
       )
-      
-      d = Dor::Item.new 
+
+      d = Dor::Item.new
 
       allow(d).to receive_messages(
-        :datastreams => {"identityMetadata"=>identityMetadataXML} 
+        :datastreams => {"identityMetadata"=>identityMetadataXML}
       )
 
       updater = Dor::UpdateMarcRecordService.new(d)
@@ -340,23 +340,23 @@ describe Dor::UpdateMarcRecordService do
 
   describe ".get_856_cons" do
     it "should return a valid sdrpurl constant" do
-      d = Dor::Item.new 
+      d = Dor::Item.new
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.get_856_cons).to eq(".856.")
     end
   end
 
-  describe ".get_1st_indicator" do     
+  describe ".get_1st_indicator" do
     it "should return 4" do
-      d = Dor::Item.new 
+      d = Dor::Item.new
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.get_1st_indicator).to eq("4")
     end
   end
 
-  describe ".get_2nd_indicator" do 
+  describe ".get_2nd_indicator" do
     it "should return 1" do
-      d = Dor::Item.new 
+      d = Dor::Item.new
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.get_2nd_indicator).to eq("1")
     end
@@ -364,7 +364,7 @@ describe Dor::UpdateMarcRecordService do
 
   describe ".get_u_field" do
     it "should return valid purl url" do
-      d = Dor::Item.new 
+      d = Dor::Item.new
       updater = Dor::UpdateMarcRecordService.new(d)
       updater.instance_variable_set(:@druid_id,"aa111aa1111")
       Dor::Config.release.purl_base_uri = "http://purl.stanford.edu"
@@ -374,7 +374,7 @@ describe Dor::UpdateMarcRecordService do
 
   describe ".get_x1_sdrpurl_marker" do
     it "should return a valid sdrpurl constant" do
-      d = Dor::Item.new 
+      d = Dor::Item.new
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.get_x1_sdrpurl_marker).to eq("|xSDR-PURL")
     end
@@ -382,13 +382,13 @@ describe Dor::UpdateMarcRecordService do
 
   describe ".get_x2_collection_info" do
     it "should return an empty string for an object without collection" do
-      d = Dor::Item.new 
+      d = Dor::Item.new
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.get_x2_collection_info).to be_empty
     end
 
     it "should return an empty string for a collection object" do
-      c = Dor::Collection.new    
+      c = Dor::Collection.new
       updater = Dor::UpdateMarcRecordService.new(c)
       expect(updater.get_x2_collection_info).to be_empty
     end
@@ -421,13 +421,13 @@ describe Dor::UpdateMarcRecordService do
       identityMetadataXML = double("Identity Metadata", ng_xml: Nokogiri::XML(build_identity_metadata_1))
       dor_item = double("Dor Item", id: "aa111aa1111", identityMetadata: identityMetadataXML)
       updater = Dor::UpdateMarcRecordService.new(dor_item)
-      expect(updater.released_to_Searchworks(dor_item)).to be true
+      expect(updater.released_to_Searchworks).to be true
     end
     it "should return false if releaseData tag has release to=SW and value is false" do
       identityMetadataXML = double("Identity Metadata", ng_xml: Nokogiri::XML(build_identity_metadata_2))
       dor_item = double("Dor Item", id: "aa111aa1111", identityMetadata: identityMetadataXML)
       updater = Dor::UpdateMarcRecordService.new(dor_item)
-      expect(updater.released_to_Searchworks(dor_item)).to be false
+      expect(updater.released_to_Searchworks).to be false
     end
   end
 

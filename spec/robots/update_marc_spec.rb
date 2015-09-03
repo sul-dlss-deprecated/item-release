@@ -10,8 +10,8 @@ describe Robots::DorRepo::Release::UpdateMarc do
 
   before :each do
     @druid='aa222cc3333'
-    @umr = Robots::DorRepo::Release::UpdateMarc.new 
-  end  
+    @umr = Robots::DorRepo::Release::UpdateMarc.new
+  end
 
   context "for a druid without a catkey" do
     it 'does nothing' do
