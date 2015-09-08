@@ -23,6 +23,7 @@ module Dor
         collection_info = get_x2_collection_info
 
         # catkey: the catalog key that associates a DOR object with a specific Symphony record.
+        # druid: the druid
         # .856. 41
         # Subfield u (required): the full Purl URL
         # Subfield x #1 (required): The string SDR-PURL as a marker to identify 856 entries managed through DOR
@@ -36,7 +37,7 @@ module Dor
         # Subfield x #5 (optional): the file-id to be used as thumb if available, recorded as file:file-id-value
         # Subfield x #6..n (optional): Collection(s) this object is a member of, recorded as collection:druid-value:ckey-value:title
 
-        new856 = "#{druid_ckey}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{object_type}#{display_type}"
+        new856 = "#{druid_ckey}\t#{@druid_id}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{object_type}#{display_type}"
         new856 << barcode unless barcode.nil?
         new856 << file_id unless file_id.nil?
         new856 << collection_info unless collection_info.nil?
