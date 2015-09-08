@@ -176,8 +176,8 @@ module Dor
     end
 
     def released_to_Searchworks
-      node = @druid_obj.identityMetadata.ng_xml.at_xpath("//identityMetadata/release[@to='Searchworks']")
-      node && node.content == 'true'
+      rel = @druid_obj.released_for
+      rel["Searchworks"]["release"]
     end
 
   end

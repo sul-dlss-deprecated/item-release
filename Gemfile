@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'addressable', '~> 2.3.5'      # pin to avoid RDF bug
-gem 'dor-services', '>= 4.20.3', '< 5.0'
+gem 'dor-services', '~> 4.22.0', '< 5.0.0'
 gem 'lyber-core', '~> 3.2', '>=3.2.4'
 gem 'robot-controller', '~> 2.0' # requires Resque
 gem 'pry', '~> 0.10.0'          # for bin/console
@@ -13,8 +13,8 @@ gem 'dor-workflow-service'
 gem 'rspec'
 
 group :development,:test do
-  gem 'coveralls', require: false 
-  gem 'vcr'  
+  gem 'coveralls', require: false
+  gem 'vcr'
 end
 
 group :development do
