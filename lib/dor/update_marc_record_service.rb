@@ -2,10 +2,9 @@ require 'open3'
 
 module Dor
   class UpdateMarcRecordService
-
-    def initialize druid_obj
+    def initialize(druid_obj)
       @druid_obj = druid_obj
-      @druid_id = @druid_obj.id.sub("druid:","")
+      @druid_id = @druid_obj.id.sub('druid:', '')
     end
 
     def push_symphony_record
@@ -14,9 +13,8 @@ module Dor
     end
 
     def generate_symphony_record
-
       druid_ckey = ckey @druid_obj
-      return "" unless druid_ckey.present?
+      return '' unless druid_ckey.present?
 
       if released_to_Searchworks
         purl_uri = get_u_field
@@ -43,35 +41,33 @@ module Dor
         new856 << collection_info unless collection_info.nil?
         new856
       else
-        "#{druid_ckey}\t"
+        "#{druid_ckey}\t#{@druid_id}\t"
       end
     end
 
-    def write_symphony_record symphony_record
-      if symphony_record.nil? || symphony_record.length == 0 then
-        return
-      end
+    def write_symphony_record(symphony_record)
+      return if symphony_record.nil? || symphony_record.length == 0
       symphony_file_name = "#{Dor::Config.release.symphony_path}/sdr-purl-856s"
       command = "#{Dor::Config.release.write_marc_script} \'#{symphony_record}\' #{symphony_file_name}"
       run_write_script(command)
     end
 
     def run_write_script(command)
-      Open3.popen3(command) do |stdin, stdout, stderr, wait_thr|
+      Open3.popen3(command) do |_stdin, stdout, stderr, _wait_thr|
         stdout_text = stdout.read
         stderr_text = stderr.read
 
-        if stdout_text.length > 0 || stderr_text.length > 0 then
-          raise "Error in writing marc_record file using the command #{command}\n#{stdout_text}\n#{stderr_text}"
+        if stdout_text.length > 0 || stderr_text.length > 0
+          fail "Error in writing marc_record file using the command #{command}\n#{stdout_text}\n#{stderr_text}"
         end
       end
     end
 
     # @return [String] value with SIRSI/Symphony numeric catkey in it, or nil if none exists
     # look in identityMetadata/otherId[@name='catkey']
-    def ckey object
-      unless object.datastreams.nil? || object.datastreams["identityMetadata"].nil?
-        if object.datastreams["identityMetadata"].ng_xml
+    def ckey(object)
+      unless object.datastreams.nil? || object.datastreams['identityMetadata'].nil?
+        if object.datastreams['identityMetadata'].ng_xml
           node = object.identityMetadata.ng_xml.at_xpath("//identityMetadata/otherId[@name='catkey']")
         end
       end
@@ -82,10 +78,10 @@ module Dor
     # look in identityMetadata/objectType
     def object_type
       @object_type ||= begin
-        objectType = ''
-        node = @druid_obj.datastreams["identityMetadata"].ng_xml.at_xpath("//identityMetadata/objectType")
-        objectType = node.content if !node.nil?
-        objectType.prepend("|x")
+        object_type = ''
+        node = @druid_obj.datastreams['identityMetadata'].ng_xml.at_xpath('//identityMetadata/objectType')
+        object_type = node.content unless node.nil?
+        object_type.prepend('|x')
       end
     end
 
@@ -93,17 +89,15 @@ module Dor
     # @return [String] identityMetadata displayType, DOR content type, or citation in an x subfield
     def display_type
       @display_type ||= begin
-        displayType = ''
-        if node = @druid_obj.datastreams["identityMetadata"].ng_xml.at_xpath("//identityMetadata/displayType")
-          displayType = node.content
-        elsif node = @druid_obj.datastreams["contentMetadata"].ng_xml.at_xpath("//contentMetadata/@type")
-          displayType = node.content
+        display_type = ''
+        if node == @druid_obj.datastreams['identityMetadata'].ng_xml.at_xpath('//identityMetadata/displayType')
+          display_type = node.content
+        elsif node == @druid_obj.datastreams['contentMetadata'].ng_xml.at_xpath('//contentMetadata/@type')
+          display_type = node.content
         else
-          if object_type != "|xcollection"
-            displayType = "citation"
-          end
+          display_type = 'citation' if object_type != '|xcollection'
         end
-        displayType.prepend("|x")
+        display_type.prepend('|x')
       end
     end
 
@@ -111,9 +105,8 @@ module Dor
     # look in identityMetadata/otherId name="barcode"
     def barcode
       @barcode ||= begin
-        barcode = nil
-        node = @druid_obj.datastreams["identityMetadata"].ng_xml.at_xpath("//identityMetadata/otherId[@name='barcode']")
-        barcode = node.content.prepend("|xbarcode:") if !node.nil?
+        node = @druid_obj.datastreams['identityMetadata'].ng_xml.at_xpath("//identityMetadata/otherId[@name='barcode']")
+        node.content.prepend('|xbarcode:') unless node.nil?
       end
     end
 
@@ -121,29 +114,29 @@ module Dor
     # @return [String] first filename
     def file_id
       id = nil
-      unless @druid_obj.datastreams.nil? || @druid_obj.datastreams["contentMetadata"].nil? then
-        if @druid_obj.datastreams["contentMetadata"].ng_xml then
-          node = @druid_obj.datastreams["contentMetadata"].ng_xml.xpath('//contentMetadata/resource/file').first
-          id = node.attr("id").prepend("|xfile:") if !node.nil?
+      unless @druid_obj.datastreams.nil? || @druid_obj.datastreams['contentMetadata'].nil?
+        if @druid_obj.datastreams['contentMetadata'].ng_xml
+          node = @druid_obj.datastreams['contentMetadata'].ng_xml.xpath('//contentMetadata/resource/file').first
+          id = node.attr('id').prepend('|xfile:') unless node.nil?
         end
       end
-      id = id.split(/\./).first if !id.nil?
+      id = id.split(/\./).first unless id.nil?
       id
     end
 
     # It returns 856 constants
     def get_856_cons
-      ".856."
+      '.856.'
     end
 
     # It returns First Indicator for HTTP (4)
     def get_1st_indicator
-      "4"
+      '4'
     end
 
     # It returns Second Indicator for Version of resource (1)
     def get_2nd_indicator
-      "1"
+      '1'
     end
 
     # It's a plceholder for the uri label
@@ -158,19 +151,19 @@ module Dor
 
     # It returns the SDR-PURL subfield
     def get_x1_sdrpurl_marker
-      "|xSDR-PURL"
+      '|xSDR-PURL'
     end
 
     # It returns the collection information subfields if exists
     # @return [String] the collection information druid-value:catkey-value:title format
     def get_x2_collection_info
       collections = @druid_obj.collections
-      coll_info = ""
+      coll_info = ''
 
-      if collections.length > 0 then
-        collections.each { |coll|
-          coll_info << "|xcollection:#{coll.id.sub("druid:","")}:#{ckey(coll)}:#{coll.label}"
-        }
+      if collections.length > 0
+        collections.each do |coll|
+          coll_info << "|xcollection:#{coll.id.sub('druid:', '')}:#{ckey(coll)}:#{coll.label}"
+        end
       end
 
       coll_info
@@ -178,8 +171,7 @@ module Dor
 
     def released_to_Searchworks
       rel = @druid_obj.released_for
-      rel["Searchworks"]["release"]
+      rel['Searchworks']['release']
     end
-
   end
 end
