@@ -114,10 +114,17 @@ module Dor
     # @return [String] first filename
     def file_id
       id = nil
+      filename = nil
       unless @druid_obj.datastreams.nil? || @druid_obj.datastreams['contentMetadata'].nil?
         if @druid_obj.datastreams['contentMetadata'].ng_xml
-          node = @druid_obj.datastreams['contentMetadata'].ng_xml.xpath('//contentMetadata/resource/file').first
-          id = node.attr('id').prepend('|xfile:') unless node.nil?
+          resources = @druid_obj.datastreams['contentMetadata'].ng_xml.xpath('//contentMetadata/resource')
+          resources.detect do |res|
+            children = res.children if res.attr('type') == 'image' || res.attr('type') == 'page'
+            children.detect do |child|
+              filename = child.attr('id') if child.attr('mimetype') == 'image/jp2'
+            end
+          end
+          id = filename.prepend('|xfile:') unless filename.nil?
         end
       end
       id = id.split(/\./).first unless id.nil?
