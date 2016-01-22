@@ -118,9 +118,9 @@ describe Dor::UpdateMarcRecordService do
     end
 
     it 'should do nothing if the symphony record is empty' do
-      d = Dor::Item.new
+      d = double(Dor::Item)
+      expect(d).to receive(:id).and_return('aa111aa1111')
       updater = Dor::UpdateMarcRecordService.new(d)
-      updater.instance_variable_set(:@druid_id, 'aa111aa1111')
       Dor::Config.release.symphony_path = "#{@fixtures}/sdr-purl"
       updater.write_symphony_record ''
 
@@ -128,9 +128,9 @@ describe Dor::UpdateMarcRecordService do
     end
 
     it 'should do nothing if the symphony record is nil' do
-      d = Dor::Item.new
+      d = double(Dor::Item)
+      expect(d).to receive(:id).and_return('aa111aa1111')
       updater = Dor::UpdateMarcRecordService.new(d)
-      updater.instance_variable_set(:@druid_id, 'aa111aa1111')
       Dor::Config.release.symphony_path = "#{@fixtures}/sdr-purl"
       updater.write_symphony_record ''
 
@@ -144,34 +144,28 @@ describe Dor::UpdateMarcRecordService do
 
   describe '.catkey' do
     it 'should return catkey from a valid identityMetadata' do
-      identity_metadata_xml = double(String)
+      d = double(Dor::Item)
+      identity_metadata_ng_xml = Nokogiri::XML(build_identity_metadata_1)
+      identity_metadata_ds = double(Dor::IdentityMetadataDS)
 
-      allow(identity_metadata_xml).to receive_messages(
-        ng_xml: Nokogiri::XML(build_identity_metadata_1)
-      )
-
-      d = Dor::Item.new
-
-      allow(d).to receive_messages(
-        datastreams: { 'identityMetadata' => identity_metadata_xml }
-      )
+      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:datastreams).exactly(3).times.and_return({'identityMetadata' => identity_metadata_ds})
+      expect(d).to receive(:identityMetadata).and_return(identity_metadata_ds)
+      expect(identity_metadata_ds).to receive(:ng_xml).twice.and_return(identity_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.ckey(d)).to eq('8832162')
     end
 
     it 'should return nil for an identityMetadata without catkey' do
-      identity_metadata_xml = double(String)
+      d = double(Dor::Item)
+      identity_metadata_ng_xml = Nokogiri::XML(build_identity_metadata_3)
+      identity_metadata_ds = double(Dor::IdentityMetadataDS)
 
-      allow(identity_metadata_xml).to receive_messages(
-        ng_xml: Nokogiri::XML(build_identity_metadata_3)
-      )
-
-      d = Dor::Item.new
-
-      allow(d).to receive_messages(
-        datastreams: { 'identityMetadata' => identity_metadata_xml }
-      )
+      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:datastreams).exactly(3).times.and_return({'identityMetadata' => identity_metadata_ds})
+      expect(d).to receive(:identityMetadata).and_return(identity_metadata_ds)
+      expect(identity_metadata_ds).to receive(:ng_xml).twice.and_return(identity_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.ckey(d)).to be_nil
@@ -180,34 +174,26 @@ describe Dor::UpdateMarcRecordService do
 
   describe '.object_type' do
     it 'should return object_type from a valid identityMetadata' do
-      identity_metadata_xml = double(String)
+      d = double(Dor::Item)
+      identity_metadata_ng_xml = Nokogiri::XML(build_identity_metadata_1)
+      identity_metadata_ds = double(Dor::IdentityMetadataDS)
 
-      allow(identity_metadata_xml).to receive_messages(
-        ng_xml: Nokogiri::XML(build_identity_metadata_1)
-      )
-
-      d = Dor::Item.new
-
-      allow(d).to receive_messages(
-        datastreams: { 'identityMetadata' => identity_metadata_xml }
-      )
+      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:datastreams).and_return({'identityMetadata' => identity_metadata_ds})
+      expect(identity_metadata_ds).to receive(:ng_xml).and_return(identity_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.object_type).to eq('|xitem')
     end
 
     it 'should return an empty x subfield for identityMetadata without object_type' do
-      identity_metadata_xml = double(String)
+      d = double(Dor::Item)
+      identity_metadata_ng_xml = Nokogiri::XML(build_identity_metadata_3)
+      identity_metadata_ds = double(Dor::IdentityMetadataDS)
 
-      allow(identity_metadata_xml).to receive_messages(
-        ng_xml: Nokogiri::XML(build_identity_metadata_3)
-      )
-
-      d = Dor::Item.new
-
-      allow(d).to receive_messages(
-        datastreams: { 'identityMetadata' => identity_metadata_xml }
-      )
+      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:datastreams).and_return({'identityMetadata' => identity_metadata_ds})
+      expect(identity_metadata_ds).to receive(:ng_xml).and_return(identity_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.object_type).to eq('|x')
@@ -216,167 +202,128 @@ describe Dor::UpdateMarcRecordService do
 
   describe '.display_type' do
     it 'should return display_type from valid identityMetadata' do
-      identity_metadata_xml = double(String)
+      d = double(Dor::Item)
+      identity_metadata_ng_xml = Nokogiri::XML(build_identity_metadata_1)
+      identity_metadata_ds = double(Dor::IdentityMetadataDS)
 
-      allow(identity_metadata_xml).to receive_messages(
-        ng_xml: Nokogiri::XML(build_identity_metadata_1)
-      )
-
-      d = Dor::Item.new
-
-      allow(d).to receive_messages(
-        datastreams: { 'identityMetadata' => identity_metadata_xml }
-      )
+      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:datastreams).and_return({'identityMetadata' => identity_metadata_ds})
+      expect(identity_metadata_ds).to receive(:ng_xml).and_return(identity_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.display_type).to eq('|ximage')
     end
 
     it "should return contentMetadata @type for display_type if identityMetadata doesn't have display_type" do
-      identity_metadata_xml = double(String)
-      content_metadata_xml = double(String)
+      d = double(Dor::Item)
+      identity_metadata_ng_xml = Nokogiri::XML(build_identity_metadata_3)
+      content_metadata_ng_xml = Nokogiri::XML(build_content_metadata_1)
+      identity_metadata_ds = double(Dor::IdentityMetadataDS)
+      content_metadata_ds = double(Dor::ContentMetadataDS)
 
-      allow(identity_metadata_xml).to receive_messages(
-        ng_xml: Nokogiri::XML(build_identity_metadata_3)
-      )
-
-      allow(content_metadata_xml).to receive_messages(
-        ng_xml: Nokogiri::XML(build_content_metadata_1)
-      )
-
-      d = Dor::Item.new
-
-      allow(d).to receive_messages(
-        datastreams: { 'identityMetadata' => identity_metadata_xml, 'contentMetadata' => content_metadata_xml }
-      )
+      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:datastreams).twice.and_return({'identityMetadata' => identity_metadata_ds, 'contentMetadata' => content_metadata_ds})
+      expect(identity_metadata_ds).to receive(:ng_xml).and_return(identity_metadata_ng_xml)
+      expect(content_metadata_ds).to receive(:ng_xml).and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.display_type).to eq('|xmap')
     end
 
     it "should return display_type of citation if identityMetadata doesn't have display_type and contentMetadata doesn't have @type" do
-      identity_metadata_xml = double(String)
-      content_metadata_xml = double(String)
+      d = double(Dor::Item)
+      identity_metadata_ng_xml = Nokogiri::XML(build_identity_metadata_3)
+      content_metadata_ng_xml = Nokogiri::XML(build_content_metadata_2)
+      identity_metadata_ds = double(Dor::IdentityMetadataDS)
+      content_metadata_ds = double(Dor::ContentMetadataDS)
 
-      allow(identity_metadata_xml).to receive_messages(
-        ng_xml: Nokogiri::XML(build_identity_metadata_3)
-      )
-
-      allow(content_metadata_xml).to receive_messages(
-        ng_xml: Nokogiri::XML(build_content_metadata_2)
-      )
-
-      d = Dor::Item.new
-
-      allow(d).to receive_messages(
-        datastreams: { 'identityMetadata' => identity_metadata_xml, 'contentMetadata' => content_metadata_xml }
-      )
+      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:datastreams).twice.and_return({'identityMetadata' => identity_metadata_ds, 'contentMetadata' => content_metadata_ds})
+      expect(identity_metadata_ds).to receive(:ng_xml).and_return(identity_metadata_ng_xml)
+      expect(content_metadata_ds).to receive(:ng_xml).and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
+      expect(updater).to receive(:object_type).and_return('|xnotacollection')
       expect(updater.display_type).to eq('|xcitation')
     end
   end
 
   describe '.barcode' do
     it 'should return barcode from a valid identityMetadata' do
-      identity_metadata_xml = double(String)
+      d = double(Dor::Item)
+      identity_metadata_ng_xml = Nokogiri::XML(build_identity_metadata_1)
+      identity_metadata_ds = double(Dor::IdentityMetadataDS)
 
-      allow(identity_metadata_xml).to receive_messages(
-        ng_xml: Nokogiri::XML(build_identity_metadata_1)
-      )
-
-      d = Dor::Item.new
-
-      allow(d).to receive_messages(
-        datastreams: { 'identityMetadata' => identity_metadata_xml }
-      )
+      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:datastreams).and_return({'identityMetadata' => identity_metadata_ds})
+      expect(identity_metadata_ds).to receive(:ng_xml).and_return(identity_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.barcode).to eq('|xbarcode:36105216275185')
     end
 
     it 'should return an empty x subfield for identityMetadata without barcode' do
-      identity_metadata_xml = double(String)
+      d = double(Dor::Item)
+      identity_metadata_ng_xml = Nokogiri::XML(build_identity_metadata_3)
+      identity_metadata_ds = double(Dor::IdentityMetadataDS)
 
-      allow(identity_metadata_xml).to receive_messages(
-        ng_xml: Nokogiri::XML(build_identity_metadata_3)
-      )
-
-      d = Dor::Item.new
-
-      allow(d).to receive_messages(
-        datastreams: { 'identityMetadata' => identity_metadata_xml }
-      )
+      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:datastreams).and_return({'identityMetadata' => identity_metadata_ds})
+      expect(identity_metadata_ds).to receive(:ng_xml).and_return(identity_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.object_type).to eq('|x')
+      expect(updater.barcode).to be nil
     end
   end
 
   describe '.file_id' do
     it 'should return file_id from a valid contentMetadata' do
-      content_metadata_xml = double(String)
+      d = double(Dor::Item)
+      content_metadata_ng_xml = Nokogiri::XML(build_content_metadata_1)
+      content_metadata_ds = double(Dor::ContentMetadataDS)
 
-      allow(content_metadata_xml).to receive_messages(
-        ng_xml: Nokogiri::XML(build_content_metadata_1)
-      )
-
-      d = Dor::Item.new
-
-      allow(d).to receive_messages(
-        datastreams: { 'contentMetadata' => content_metadata_xml }
-      )
+      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:datastreams).exactly(4).times.and_return({'contentMetadata' => content_metadata_ds})
+      expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0001')
     end
 
     it 'should return an empty x subfield for contentMetadata without file_id' do
-      content_metadata_xml = double(String)
+      d = double(Dor::Item)
+      content_metadata_ng_xml = Nokogiri::XML(build_content_metadata_3)
+      content_metadata_ds = double(Dor::ContentMetadataDS)
 
-      allow(content_metadata_xml).to receive_messages(
-        ng_xml: Nokogiri::XML(build_content_metadata_3)
-      )
-
-      d = Dor::Item.new
-
-      allow(d).to receive_messages(
-        datastreams: { 'contentMetadata' => content_metadata_xml }
-      )
+      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:datastreams).exactly(4).times.and_return({'contentMetadata' => content_metadata_ds})
+      expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.file_id).to eq(nil)
     end
 
     it 'should return correct file_id from a valid contentMetadata  with resource type = image' do
-      content_metadata_xml = double(String)
+      d = double(Dor::Item)
+      content_metadata_ng_xml = Nokogiri::XML(build_content_metadata_4)
+      content_metadata_ds = double(Dor::ContentMetadataDS)
 
-      allow(content_metadata_xml).to receive_messages(
-        ng_xml: Nokogiri::XML(build_content_metadata_4)
-      )
-
-      d = Dor::Item.new
-
-      allow(d).to receive_messages(
-        datastreams: { 'contentMetadata' => content_metadata_xml }
-      )
+      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:datastreams).exactly(4).times.and_return({'contentMetadata' => content_metadata_ds})
+      expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0001')
     end
 
     it 'should return correct file_id from a valid contentMetadata with resource type = page' do
-      content_metadata_xml = double(String)
+      d = double(Dor::Item)
+      content_metadata_ng_xml = Nokogiri::XML(build_content_metadata_5)
+      content_metadata_ds = double(Dor::ContentMetadataDS)
 
-      allow(content_metadata_xml).to receive_messages(
-        ng_xml: Nokogiri::XML(build_content_metadata_5)
-      )
-
-      d = Dor::Item.new
-
-      allow(d).to receive_messages(
-        datastreams: { 'contentMetadata' => content_metadata_xml }
-      )
+      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:datastreams).exactly(4).times.and_return({'contentMetadata' => content_metadata_ds})
+      expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0002')
@@ -385,7 +332,8 @@ describe Dor::UpdateMarcRecordService do
 
   describe '.get_856_cons' do
     it 'should return a valid sdrpurl constant' do
-      d = Dor::Item.new
+      d = double(Dor::Item)
+      expect(d).to receive(:id).and_return('')
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.get_856_cons).to eq('.856.')
     end
@@ -393,7 +341,8 @@ describe Dor::UpdateMarcRecordService do
 
   describe '.get_1st_indicator' do
     it 'should return 4' do
-      d = Dor::Item.new
+      d = double(Dor::Item)
+      expect(d).to receive(:id).and_return('')
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.get_1st_indicator).to eq('4')
     end
@@ -401,7 +350,8 @@ describe Dor::UpdateMarcRecordService do
 
   describe '.get_2nd_indicator' do
     it 'should return 1' do
-      d = Dor::Item.new
+      d = double(Dor::Item)
+      expect(d).to receive(:id).and_return('')
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.get_2nd_indicator).to eq('1')
     end
@@ -409,9 +359,9 @@ describe Dor::UpdateMarcRecordService do
 
   describe '.get_u_field' do
     it 'should return valid purl url' do
-      d = Dor::Item.new
+      d = double(Dor::Item)
+      expect(d).to receive(:id).and_return('aa111aa1111')
       updater = Dor::UpdateMarcRecordService.new(d)
-      updater.instance_variable_set(:@druid_id, 'aa111aa1111')
       Dor::Config.release.purl_base_uri = 'http://purl.stanford.edu'
       expect(updater.get_u_field).to eq('|uhttp://purl.stanford.edu/aa111aa1111')
     end
@@ -419,7 +369,8 @@ describe Dor::UpdateMarcRecordService do
 
   describe '.get_x1_sdrpurl_marker' do
     it 'should return a valid sdrpurl constant' do
-      d = Dor::Item.new
+      d = double(Dor::Item)
+      expect(d).to receive(:id).and_return('')
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.get_x1_sdrpurl_marker).to eq('|xSDR-PURL')
     end
@@ -427,13 +378,17 @@ describe Dor::UpdateMarcRecordService do
 
   describe '.get_x2_collection_info' do
     it 'should return an empty string for an object without collection' do
-      d = Dor::Item.new
+      d = double(Dor::Item)
+      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:collections).and_return([])
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.get_x2_collection_info).to be_empty
     end
 
     it 'should return an empty string for a collection object' do
-      c = Dor::Collection.new
+      c = double(Dor::Collection)
+      expect(c).to receive(:id).and_return('')
+      expect(c).to receive(:collections).and_return([])
       updater = Dor::UpdateMarcRecordService.new(c)
       expect(updater.get_x2_collection_info).to be_empty
     end

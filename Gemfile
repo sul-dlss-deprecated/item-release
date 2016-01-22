@@ -1,8 +1,7 @@
 source 'https://rubygems.org'
 
-gem 'addressable', '~> 2.3.5'      # pin to avoid RDF bug
-gem 'dor-services', '~> 4.22.0', '< 5.0.0'
-gem 'lyber-core', '~> 3.2', '>=3.2.4'
+gem 'dor-services', '~> 5.3'
+gem 'lyber-core', '~> 3.3'
 gem 'robot-controller', '~> 2.0' # requires Resque
 gem 'pry', '~> 0.10.0'          # for bin/console
 gem 'slop', '>= 3.5.0'          # for bin/run_robot
@@ -12,7 +11,7 @@ gem 'retries'
 gem 'dor-workflow-service'
 gem 'rspec'
 
-group :development,:test do
+group :development, :test do
   gem 'coveralls', require: false
   gem 'vcr'
 end
@@ -22,11 +21,7 @@ group :development do
     instance_eval(File.read(mygems))
   end
   gem 'awesome_print'
-  gem 'debugger', :platform => :ruby_19
-	gem 'yard'
-	gem 'capistrano', '>= 3.2.1'
-  gem 'capistrano-rvm'
-  gem 'capistrano-bundler', '~> 1.1'
-  gem 'lyberteam-capistrano-devel', "~> 3.0"
+  gem 'yard'
+  gem 'dlss-capistrano'
   gem 'json_pure'
 end

@@ -7,7 +7,7 @@ Robot suite that handles item release and updating PURLs to prepare for indexing
 
 ## Dependences
 
-Ruby 1.9.3
+Ruby 2.2.2
 
 ## Setup
 
