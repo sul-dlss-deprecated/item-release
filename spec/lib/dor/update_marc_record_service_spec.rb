@@ -71,7 +71,7 @@ describe Dor::UpdateMarcRecordService do
       allow(item).to receive(:released_for).and_return(release_data)
 
       updater = Dor::UpdateMarcRecordService.new(item)
-      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xitem|ximage|xbarcode:36105216275185|xfile:wt183gy6220_00_0001|xcollection:cc111cc1111::Collection label")
+      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xitem|ximage|xbarcode:36105216275185|xfile:wt183gy6220_00_0001.jp2|xcollection:cc111cc1111::Collection label")
     end
 
     it 'should generate symphony record for a collection object with catkey' do
@@ -101,7 +101,7 @@ describe Dor::UpdateMarcRecordService do
       allow(collection).to receive(:released_for).and_return(release_data)
 
       updater = Dor::UpdateMarcRecordService.new(collection)
-      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|ximage|xfile:wt183gy6220_00_0001")
+      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|ximage|xfile:wt183gy6220_00_0001.jp2")
     end
   end
 
@@ -287,7 +287,7 @@ describe Dor::UpdateMarcRecordService do
       expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0001')
+      expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0001.jp2')
     end
 
     it 'should return an empty x subfield for contentMetadata without file_id' do
@@ -313,7 +313,7 @@ describe Dor::UpdateMarcRecordService do
       expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0001')
+      expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0001.jp2')
     end
 
     it 'should return correct file_id from a valid contentMetadata with resource type = page' do
@@ -326,7 +326,7 @@ describe Dor::UpdateMarcRecordService do
       expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0002')
+      expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0002.jp2')
     end
   end
 

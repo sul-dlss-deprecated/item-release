@@ -127,7 +127,6 @@ module Dor
           id = filename.prepend('|xfile:') unless filename.nil?
         end
       end
-      id = id.split(/\./).first unless id.nil?
       id
     end
 
