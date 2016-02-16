@@ -12,12 +12,14 @@ ROBOT_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
 ROBOT_LOG = Logger.new(File.join(ROBOT_ROOT, "log/#{environment}.log"))
 ROBOT_LOG.level = Logger::SEV_LABEL.index(ENV['ROBOT_LOG_LEVEL']) || Logger::INFO
 
+# rubocop:disable HandleExceptions
 # Override Solrizer's logger before it gets a chance to load and pollute STDERR.
 begin
   require 'solrizer'
   Solrizer.logger = ROBOT_LOG
 rescue LoadError, NameError, NoMethodError
 end
+# rubocop:enaable HandleExceptions
 
 # Load core robot services
 require 'dor-services'
@@ -35,6 +37,7 @@ env_file = File.expand_path(File.dirname(__FILE__) + "/./environments/#{environm
 puts "Loading config from #{env_file}"
 require env_file
 
+# rubocop:disable UnderscorePrefixedVariableName
 # Load Resque configuration and controller
 require 'resque'
 begin
@@ -48,3 +51,4 @@ begin
   end
 end
 require 'robot-controller'
+# rubocop:enable UnderscorePrefixedVariableName

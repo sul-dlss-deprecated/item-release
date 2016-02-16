@@ -12,6 +12,7 @@ silence_warnings do
     require 'pry'
     IRB = Pry
   rescue LoadError
+    puts "LoadError!"
   end
 end
 

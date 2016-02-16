@@ -90,9 +90,10 @@ module Dor
     def display_type
       @display_type ||= begin
         display_type = ''
-        if node = @druid_obj.datastreams['identityMetadata'].ng_xml.at_xpath('//identityMetadata/displayType')
+        # deliberate assignment as part of the conditional
+        if (node = @druid_obj.datastreams['identityMetadata'].ng_xml.at_xpath('//identityMetadata/displayType'))
           display_type = node.content
-        elsif node = @druid_obj.datastreams['contentMetadata'].ng_xml.at_xpath('//contentMetadata/@type')
+        elsif (node = @druid_obj.datastreams['contentMetadata'].ng_xml.at_xpath('//contentMetadata/@type'))
           display_type = node.content
         else
           display_type = 'citation' if object_type != '|xcollection'

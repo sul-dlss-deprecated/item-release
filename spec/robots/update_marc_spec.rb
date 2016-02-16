@@ -47,7 +47,7 @@ describe Robots::DorRepo::Release::UpdateMarc do
 end
 
 def build_identity_metadata_1
-      identityMetadataXML = '<identityMetadata>
+  '<identityMetadata>
   <sourceId source="sul">36105216275185</sourceId>
   <objectId>druid:bb987ch8177</objectId>
   <objectCreator>DOR</objectCreator>
@@ -62,5 +62,5 @@ def build_identity_metadata_1
   <tag>LAB : MAPS</tag>
   <tag>Registered By : dfuzzell</tag>
   <tag>Remediated By : 4.15.4</tag>
-</identityMetadata>'
+  </identityMetadata>'
 end

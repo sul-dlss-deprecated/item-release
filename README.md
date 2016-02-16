@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/sul-dlss/item-release.svg?branch=master)](https://travis-ci.org/sul-dlss/item-release)
 [![Dependency Status](https://gemnasium.com/sul-dlss/item-release.svg)](https://gemnasium.com/sul-dlss/item-release)
+[![Coverage Status](https://coveralls.io/repos/github/sul-dlss/item-release/badge.svg?branch=add-coveralls-hound)](https://coveralls.io/github/sul-dlss/item-release?branch=add-coveralls-hound)
 
 # Item Release Robot Suite
 
