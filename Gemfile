@@ -14,10 +14,12 @@ gem 'rspec'
 group :development, :test do
   gem 'coveralls', require: false
   gem 'vcr'
+  gem 'rubocop'
+  gem 'rubocop-rspec'
 end
 
 group :development do
-  if File.exists?(mygems = File.join(ENV['HOME'],'.gemfile'))
+  if File.exist?(mygems = File.join(ENV['HOME'],'.gemfile'))
     instance_eval(File.read(mygems))
   end
   gem 'awesome_print'

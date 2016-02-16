@@ -15,4 +15,6 @@ config/environments/production.rb
 .DS_Store
 .ruby-version
 .ruby-gemset
+log/
+*.log
 spec/fixtures

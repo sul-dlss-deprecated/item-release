@@ -54,21 +54,20 @@ namespace :deploy do
         execute :chmod, "u+x", release_path.join("bin/write_marc_record")
     end
   end
-  
+
   desc 'Restart application'
   task :restart do
     on roles(:app), in: :sequence, wait: 10 do
       within release_path do
-        # Uncomment  with the first deploy 
+        # Uncomment  with the first deploy
         # execute :bundle, :install
-         
+
         # Comment with the first deploy
         test :bundle, :exec, :controller, :stop
         test :bundle, :exec, :controller, :quit
-        
+
         # Always call the boot
         execute :bundle, :exec, :controller, :boot
-        
       end
     end
   end
@@ -76,5 +75,4 @@ namespace :deploy do
   after :publishing, :restart
   after :restart, :chnage_script_mode
 
-
- end
+end
