@@ -66,7 +66,7 @@ GEM
       capistrano-releaseboard
     docile (1.1.5)
     docopt (0.5.0)
-    domain_name (0.5.25)
+    domain_name (0.5.20160128)
       unf (>= 0.0.5, < 1.0.0)
     dor-fetcher (1.1.7)
       addressable
@@ -273,7 +273,7 @@ GEM
       net-scp (>= 1.1.2)
       net-ssh
       term-ansicolor
-    stanford-mods (1.4.0)
+    stanford-mods (1.5.4)
       activesupport
       mods (~> 2.0.2)
     state_machine (1.2.0)
@@ -290,7 +290,8 @@ GEM
     uber (0.0.15)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.1)
+    unf_ext (0.0.7.2)
+    unicode-display_width (0.3.1)
     uuidtools (2.1.5)
     validatable (1.6.7)
     vcr (3.0.1)
