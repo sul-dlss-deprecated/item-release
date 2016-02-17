@@ -35,7 +35,7 @@ module Dor
         # Subfield x #5 (optional): the file-id to be used as thumb if available, recorded as file:file-id-value
         # Subfield x #6..n (optional): Collection(s) this object is a member of, recorded as collection:druid-value:ckey-value:title
 
-        new856 = "#{druid_ckey}\t#{@druid_id}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{object_type}#{display_type}"
+        new856 = "#{druid_ckey}\t#{@druid_id}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{object_type}"
         new856 << barcode unless barcode.nil?
         new856 << file_id unless file_id.nil?
         new856 << collection_info unless collection_info.nil?
@@ -85,23 +85,6 @@ module Dor
       end
     end
 
-    # value is used to tell SearchWorks UI app of specific display needs for objects
-    # @return [String] identityMetadata displayType, DOR content type, or citation in an x subfield
-    def display_type
-      @display_type ||= begin
-        display_type = ''
-        # deliberate assignment as part of the conditional
-        if (node = @druid_obj.datastreams['identityMetadata'].ng_xml.at_xpath('//identityMetadata/displayType'))
-          display_type = node.content
-        elsif (node = @druid_obj.datastreams['contentMetadata'].ng_xml.at_xpath('//contentMetadata/@type'))
-          display_type = node.content
-        else
-          display_type = 'citation' if object_type != '|xcollection'
-        end
-        display_type.prepend('|x')
-      end
-    end
-
     # @return [String] value with barcode in it, or empty x subfield if none exists
     # look in identityMetadata/otherId name="barcode"
     def barcode
@@ -111,7 +94,7 @@ module Dor
       end
     end
 
-    # the @id attribute of resource/file elements that match the display_type, including extension
+    # the @id attribute of resource/file elements including extension
     # @return [String] first filename
     def file_id
       id = nil
