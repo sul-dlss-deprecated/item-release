@@ -71,7 +71,7 @@ describe Dor::UpdateMarcRecordService do
       allow(item).to receive(:released_for).and_return(release_data)
 
       updater = Dor::UpdateMarcRecordService.new(item)
-      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xitem|ximage|xbarcode:36105216275185|xfile:wt183gy6220_00_0001.jp2|xcollection:cc111cc1111::Collection label")
+      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xitem|xbarcode:36105216275185|xfile:wt183gy6220_00_0001.jp2|xcollection:cc111cc1111::Collection label")
     end
 
     it 'should generate symphony record for a collection object with catkey' do
@@ -101,7 +101,7 @@ describe Dor::UpdateMarcRecordService do
       allow(collection).to receive(:released_for).and_return(release_data)
 
       updater = Dor::UpdateMarcRecordService.new(collection)
-      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|ximage|xfile:wt183gy6220_00_0001.jp2")
+      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|xfile:wt183gy6220_00_0001.jp2")
     end
   end
 
@@ -197,54 +197,6 @@ describe Dor::UpdateMarcRecordService do
 
       updater = Dor::UpdateMarcRecordService.new(d)
       expect(updater.object_type).to eq('|x')
-    end
-  end
-
-  describe '.display_type' do
-    it 'should return display_type from valid identityMetadata' do
-      d = double(Dor::Item)
-      identity_metadata_ng_xml = Nokogiri::XML(build_identity_metadata_1)
-      identity_metadata_ds = double(Dor::IdentityMetadataDS)
-
-      expect(d).to receive(:id).and_return('')
-      expect(d).to receive(:datastreams).and_return({'identityMetadata' => identity_metadata_ds})
-      expect(identity_metadata_ds).to receive(:ng_xml).and_return(identity_metadata_ng_xml)
-
-      updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.display_type).to eq('|ximage')
-    end
-
-    it "should return contentMetadata @type for display_type if identityMetadata doesn't have display_type" do
-      d = double(Dor::Item)
-      identity_metadata_ng_xml = Nokogiri::XML(build_identity_metadata_3)
-      content_metadata_ng_xml = Nokogiri::XML(build_content_metadata_1)
-      identity_metadata_ds = double(Dor::IdentityMetadataDS)
-      content_metadata_ds = double(Dor::ContentMetadataDS)
-
-      expect(d).to receive(:id).and_return('')
-      expect(d).to receive(:datastreams).twice.and_return({'identityMetadata' => identity_metadata_ds, 'contentMetadata' => content_metadata_ds})
-      expect(identity_metadata_ds).to receive(:ng_xml).and_return(identity_metadata_ng_xml)
-      expect(content_metadata_ds).to receive(:ng_xml).and_return(content_metadata_ng_xml)
-
-      updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.display_type).to eq('|xmap')
-    end
-
-    it "should return display_type of citation if identityMetadata doesn't have display_type and contentMetadata doesn't have @type" do
-      d = double(Dor::Item)
-      identity_metadata_ng_xml = Nokogiri::XML(build_identity_metadata_3)
-      content_metadata_ng_xml = Nokogiri::XML(build_content_metadata_2)
-      identity_metadata_ds = double(Dor::IdentityMetadataDS)
-      content_metadata_ds = double(Dor::ContentMetadataDS)
-
-      expect(d).to receive(:id).and_return('')
-      expect(d).to receive(:datastreams).twice.and_return({'identityMetadata' => identity_metadata_ds, 'contentMetadata' => content_metadata_ds})
-      expect(identity_metadata_ds).to receive(:ng_xml).and_return(identity_metadata_ng_xml)
-      expect(content_metadata_ds).to receive(:ng_xml).and_return(content_metadata_ng_xml)
-
-      updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater).to receive(:object_type).and_return('|xnotacollection')
-      expect(updater.display_type).to eq('|xcitation')
     end
   end
 
