@@ -103,12 +103,13 @@ module Dor
         if @druid_obj.datastreams['contentMetadata'].ng_xml
           resources = @druid_obj.datastreams['contentMetadata'].ng_xml.xpath('//contentMetadata/resource')
           resources.detect do |res|
-            children = res.children if res.attr('type') == 'image' || res.attr('type') == 'page'
+            # Added thumb based upon recommendation from Lynn McRae for future use
+            children = res.children if %w(image page thumb).include?(res.attr('type'))
             children.detect do |child|
               filename = child.attr('id') if child.attr('mimetype') == 'image/jp2'
             end
           end
-          id = filename.prepend('|xfile:') unless filename.nil?
+          id = filename.prepend("|xfile:#{@druid_id}%2F") unless filename.nil?
         end
       end
       id
