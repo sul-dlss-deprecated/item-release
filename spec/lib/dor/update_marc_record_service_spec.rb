@@ -71,7 +71,7 @@ describe Dor::UpdateMarcRecordService do
       allow(item).to receive(:released_for).and_return(release_data)
 
       updater = Dor::UpdateMarcRecordService.new(item)
-      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xitem|xbarcode:36105216275185|xfile:wt183gy6220_00_0001.jp2|xcollection:cc111cc1111::Collection label")
+      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xitem|xbarcode:36105216275185|xfile:aa111aa1111%2Fwt183gy6220_00_0001.jp2|xcollection:cc111cc1111::Collection label")
     end
 
     it 'should generate symphony record for a collection object with catkey' do
@@ -101,7 +101,7 @@ describe Dor::UpdateMarcRecordService do
       allow(collection).to receive(:released_for).and_return(release_data)
 
       updater = Dor::UpdateMarcRecordService.new(collection)
-      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|xfile:wt183gy6220_00_0001.jp2")
+      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|xfile:aa111aa1111%2Fwt183gy6220_00_0001.jp2")
     end
   end
 
@@ -234,12 +234,12 @@ describe Dor::UpdateMarcRecordService do
       content_metadata_ng_xml = Nokogiri::XML(build_content_metadata_1)
       content_metadata_ds = double(Dor::ContentMetadataDS)
 
-      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:id).and_return('bb111bb2222')
       expect(d).to receive(:datastreams).exactly(4).times.and_return({'contentMetadata' => content_metadata_ds})
       expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0001.jp2')
+      expect(updater.file_id).to eq('|xfile:bb111bb2222%2Fwt183gy6220_00_0001.jp2')
     end
 
     it 'should return an empty x subfield for contentMetadata without file_id' do
@@ -247,7 +247,7 @@ describe Dor::UpdateMarcRecordService do
       content_metadata_ng_xml = Nokogiri::XML(build_content_metadata_3)
       content_metadata_ds = double(Dor::ContentMetadataDS)
 
-      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:id).and_return('aa111aa2222')
       expect(d).to receive(:datastreams).exactly(4).times.and_return({'contentMetadata' => content_metadata_ds})
       expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
 
@@ -260,12 +260,12 @@ describe Dor::UpdateMarcRecordService do
       content_metadata_ng_xml = Nokogiri::XML(build_content_metadata_4)
       content_metadata_ds = double(Dor::ContentMetadataDS)
 
-      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:id).and_return('bb111bb2222')
       expect(d).to receive(:datastreams).exactly(4).times.and_return({'contentMetadata' => content_metadata_ds})
       expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0001.jp2')
+      expect(updater.file_id).to eq('|xfile:bb111bb2222%2Fwt183gy6220_00_0001.jp2')
     end
 
     it 'should return correct file_id from a valid contentMetadata with resource type = page' do
@@ -273,12 +273,26 @@ describe Dor::UpdateMarcRecordService do
       content_metadata_ng_xml = Nokogiri::XML(build_content_metadata_5)
       content_metadata_ds = double(Dor::ContentMetadataDS)
 
-      expect(d).to receive(:id).and_return('')
+      expect(d).to receive(:id).and_return('aa111aa2222')
       expect(d).to receive(:datastreams).exactly(4).times.and_return({'contentMetadata' => content_metadata_ds})
       expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0002.jp2')
+      expect(updater.file_id).to eq('|xfile:aa111aa2222%2Fwt183gy6220_00_0002.jp2')
+    end
+
+    # Added thumb based upon recommendation from Lynn McRae for future use
+    it 'should return correct file_id from a valid contentMetadata with resource type = thumb' do
+      d = double(Dor::Item)
+      content_metadata_ng_xml = Nokogiri::XML(build_content_metadata_6)
+      content_metadata_ds = double(Dor::ContentMetadataDS)
+
+      expect(d).to receive(:id).and_return('bb111bb2222')
+      expect(d).to receive(:datastreams).exactly(4).times.and_return({'contentMetadata' => content_metadata_ds})
+      expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
+
+      updater = Dor::UpdateMarcRecordService.new(d)
+      expect(updater.file_id).to eq('|xfile:bb111bb2222%2Fwt183gy6220_00_0002.jp2')
     end
   end
 
@@ -543,6 +557,30 @@ describe Dor::UpdateMarcRecordService do
 </file>
 </resource>
 <resource id="wt183gy6220_2" sequence="2" type="page">
+<label>Page 1</label>
+<file id="wt183gy6220_00_0002.jp2" mimetype="image/jp2" size="3182927">
+<imageData width="4531" height="3715"/>
+</file>
+</resource>
+<resource id="wt183gy6220_1" sequence="3" type="page">
+<label>Page 2</label>
+<file id="wt183gy6220_00_0001.jp2" mimetype="image/jp2" size="3182927">
+<imageData width="4531" height="3715"/>
+</file>
+</resource>
+</contentMetadata>'
+  end
+
+  # Added thumb based upon recommendation from Lynn McRae for future use
+  def build_content_metadata_6
+    '<contentMetadata objectId="wt183gy6220">
+<resource id="wt183gy6220_1" sequence="1" type="image">
+<label>PDF 1</label>
+<file id="wt183gy6220.pdf" mimetype="application/pdf" size="3182927">
+<imageData width="4531" height="3715"/>
+</file>
+</resource>
+<resource id="wt183gy6220_2" sequence="2" type="thumb">
 <label>Page 1</label>
 <file id="wt183gy6220_00_0002.jp2" mimetype="image/jp2" size="3182927">
 <imageData width="4531" height="3715"/>
