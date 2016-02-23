@@ -9,11 +9,11 @@ gem 'rake', '>= 10.3.2'
 gem 'dor-fetcher'
 gem 'retries'
 gem 'dor-workflow-service'
-gem 'rspec'
 
 group :development, :test do
   gem 'coveralls', require: false
   gem 'vcr'
+  gem 'rspec'
   gem 'rubocop'
   gem 'rubocop-rspec'
 end
@@ -22,8 +22,6 @@ group :development do
   if File.exist?(mygems = File.join(ENV['HOME'],'.gemfile'))
     instance_eval(File.read(mygems))
   end
-  gem 'awesome_print'
   gem 'yard'
   gem 'dlss-capistrano'
-  gem 'json_pure'
 end
