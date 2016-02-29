@@ -1,9 +1,15 @@
 require 'rake'
 require 'rake/testtask'
 require 'robot-controller/tasks'
-require 'rubocop/rake_task'
-RuboCop::RakeTask.new(:rubocop) do |task|
- task.options = ['-l'] # run lint cops only
+begin
+  require 'rubocop/rake_task'
+  RuboCop::RakeTask.new(:rubocop) do |task|
+   task.options = ['-l'] # run lint cops only
+  end
+rescue LoadError
+  task :rubocop do
+    puts "Rubocop is not installed"
+  end
 end
 
 # Import external rake tasks
@@ -14,8 +20,15 @@ task default: :ci
 desc "run continuous integration suite (tests, coverage, rubocop lint)"
 task :ci => [:spec, :rubocop]
 
-require 'rspec/core/rake_task'
-RSpec::Core::RakeTask.new(:spec)
+begin
+  require 'rspec/core/rake_task'
+  RSpec::Core::RakeTask.new(:spec)
+rescue LoadError
+  task :spec do
+    puts "RSpec is not installed"
+  end
+end
+
 
 desc 'Get application version'
 task :app_version do
