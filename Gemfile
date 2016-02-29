@@ -23,5 +23,7 @@ group :development do
     instance_eval(File.read(mygems))
   end
   gem 'yard'
+  gem 'capistrano', '~> 3.0'
+  gem 'capistrano-bundler', '~> 1.1'
   gem 'dlss-capistrano'
 end
