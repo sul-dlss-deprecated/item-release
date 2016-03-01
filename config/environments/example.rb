@@ -13,7 +13,7 @@ Dor::Config.configure do
   end
 
   workflow.url 'https://example.com/workflow/'
-  solrizer.url 'http://localhost:8080/solr/argo'
+  solr.url 'http://localhost:8080/solr/argo'
   
   robots do 
     workspace '/tmp'
