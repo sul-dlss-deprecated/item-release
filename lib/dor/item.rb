@@ -109,7 +109,7 @@ module Dor::Release
 
       # set release-members step to completed
       with_retries(max_tries: Dor::Config.release.max_tries, handler: handler, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
-        Dor::WorkflowService.update_workflow_status 'dor', druid, Dor::Config.release.workflow_name, 'release-members', 'skipped'
+        Dor::Config.workflow.client.update_workflow_status 'dor', druid, Dor::Config.release.workflow_name, 'release-members', 'skipped'
       end
     end
   end # class Item

@@ -75,7 +75,7 @@ GEM
       rest-client
     dor-rights-auth (1.0.2)
       nokogiri
-    dor-services (5.4.2)
+    dor-services (5.5.0)
       active-fedora (~> 6.0)
       activesupport (>= 3.2.18)
       confstruct (~> 0.2.7)
@@ -315,8 +315,7 @@ DEPENDENCIES
   coveralls
   dlss-capistrano
   dor-fetcher
-  dor-services (~> 5.4, >= 5.4.2)
-  dor-workflow-service (~> 2.0)
+  dor-services (~> 5.5)
   lyber-core (~> 4.0)
   pry (~> 0.10.0)
   rake (>= 10.3.2)
