@@ -13,7 +13,7 @@ group :development, :test do
   gem 'coveralls', require: false
   gem 'vcr'
   gem 'rspec'
-  gem 'rubocop'
+  gem 'rubocop', '0.37.2'
   gem 'rubocop-rspec'
 end
 
