@@ -19,6 +19,7 @@ module Dor
       if released_to_Searchworks
         purl_uri = get_u_field
         collection_info = get_x2_collection_info
+        constituent_info = get_x2_constituent_info
 
         # catkey: the catalog key that associates a DOR object with a specific Symphony record.
         # druid: the druid
@@ -34,11 +35,13 @@ module Dor
         # Subfield x #4 (optional): the barcode if known (<identityMetadata><otherId name="barcode">, recorded as barcode:barcode-value
         # Subfield x #5 (optional): the file-id to be used as thumb if available, recorded as file:file-id-value
         # Subfield x #6..n (optional): Collection(s) this object is a member of, recorded as collection:druid-value:ckey-value:title
+        # Subfield x #7..n (optional): Set(s) this object is a member of, recorded as set:druid-value:ckey-value:title
 
         new856 = "#{druid_ckey}\t#{@druid_id}\t#{get_856_cons} #{get_1st_indicator}#{get_2nd_indicator}#{purl_uri}#{get_x1_sdrpurl_marker}#{object_type}"
         new856 << barcode unless barcode.nil?
         new856 << file_id unless file_id.nil?
         new856 << collection_info unless collection_info.nil?
+        new856 << constituent_info unless constituent_info.nil?
         new856
       else
         "#{druid_ckey}\t#{@druid_id}\t"
@@ -109,7 +112,7 @@ module Dor
               filename = child.attr('id') if child.attr('mimetype') == 'image/jp2'
             end
           end
-          id = filename.prepend("|xfile:#{@druid_id}%2F") unless filename.nil?
+          id = filename.prepend("|xfile:") unless filename.nil?
         end
       end
       id
@@ -160,9 +163,32 @@ module Dor
       coll_info
     end
 
+    # It returns the constituent information subfields if exists
+    # @return [String] the constituent information druid-value:catkey-value:title format
+    def get_x2_constituent_info
+      dor_items_for_constituents.map do |cons_obj|
+        cons_obj_id = cons_obj.id.sub('druid:', '')
+        cons_obj_title = cons_obj.datastreams['descMetadata'].ng_xml.xpath('//mods/titleInfo/title').first.content
+        "|xset:#{cons_obj_id}:#{ckey(cons_obj)}:#{cons_obj_title}"
+      end.join('')
+    end
+
     def released_to_Searchworks
       rel = @druid_obj.released_for
       rel['Searchworks']['release']
+    end
+
+    private
+
+    def dor_items_for_constituents
+      return [] unless @druid_obj.datastreams
+      return [] unless @druid_obj.datastreams['RELS-EXT']
+      return [] unless @druid_obj.datastreams['RELS-EXT'].ng_xml
+      constituents = @druid_obj.datastreams['RELS-EXT'].ng_xml.xpath('//rdf:RDF/rdf:Description/fedora:isConstituentOf')
+      constituents.map do |cons|
+        cons_druid = cons.attr('rdf:resource').sub('info:fedora/', '')
+        Dor::Item.find(cons_druid)
+      end
     end
   end
 end

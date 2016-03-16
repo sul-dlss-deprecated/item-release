@@ -45,8 +45,12 @@ describe Dor::UpdateMarcRecordService do
 
       item = Dor::Item.new
       collection = Dor::Collection.new
+      constituent = Dor::Item.new
+
+      rels_ext_xml = double(String)
       identity_metadata_xml = double(String)
       content_metadata_xml = double(String)
+      desc_metadata_xml = double(String)
 
       allow(identity_metadata_xml).to receive_messages(
         ng_xml: Nokogiri::XML(build_identity_metadata_1)
@@ -54,6 +58,14 @@ describe Dor::UpdateMarcRecordService do
 
       allow(content_metadata_xml).to receive_messages(
         ng_xml: Nokogiri::XML(build_content_metadata_1)
+      )
+
+      allow(desc_metadata_xml).to receive_messages(
+        ng_xml: Nokogiri::XML(build_desc_metadata_1)
+      )
+
+      allow(rels_ext_xml).to receive_messages(
+        ng_xml: Nokogiri::XML(build_rels_ext)
       )
 
       allow(collection).to receive_messages(
@@ -64,14 +76,20 @@ describe Dor::UpdateMarcRecordService do
       allow(item).to receive_messages(
         id: 'aa111aa1111',
         collections: [collection],
-        datastreams: { 'identityMetadata' => identity_metadata_xml, 'contentMetadata' => content_metadata_xml }
+        datastreams: { 'identityMetadata' => identity_metadata_xml, 'contentMetadata' => content_metadata_xml, 'RELS-EXT' => rels_ext_xml }
+      )
+
+      allow(constituent).to receive_messages(
+        id: 'dd111dd1111',
+        datastreams: { 'descMetadata' => desc_metadata_xml }
       )
 
       release_data = { 'Searchworks' => { 'release' => true } }
       allow(item).to receive(:released_for).and_return(release_data)
 
+      allow_any_instance_of(Dor::UpdateMarcRecordService).to receive(:dor_items_for_constituents).and_return([constituent])
       updater = Dor::UpdateMarcRecordService.new(item)
-      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xitem|xbarcode:36105216275185|xfile:aa111aa1111%2Fwt183gy6220_00_0001.jp2|xcollection:cc111cc1111::Collection label")
+      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xitem|xbarcode:36105216275185|xfile:wt183gy6220_00_0001.jp2|xcollection:cc111cc1111::Collection label|xset:dd111dd1111::Constituent label")
     end
 
     it 'should generate symphony record for a collection object with catkey' do
@@ -101,7 +119,7 @@ describe Dor::UpdateMarcRecordService do
       allow(collection).to receive(:released_for).and_return(release_data)
 
       updater = Dor::UpdateMarcRecordService.new(collection)
-      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|xfile:aa111aa1111%2Fwt183gy6220_00_0001.jp2")
+      expect(updater.generate_symphony_record).to eq("8832162\taa111aa1111\t.856. 41|uhttp://purl.stanford.edu/aa111aa1111|xSDR-PURL|xcollection|xfile:wt183gy6220_00_0001.jp2")
     end
   end
 
@@ -239,7 +257,7 @@ describe Dor::UpdateMarcRecordService do
       expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.file_id).to eq('|xfile:bb111bb2222%2Fwt183gy6220_00_0001.jp2')
+      expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0001.jp2')
     end
 
     it 'should return an empty x subfield for contentMetadata without file_id' do
@@ -265,7 +283,7 @@ describe Dor::UpdateMarcRecordService do
       expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.file_id).to eq('|xfile:bb111bb2222%2Fwt183gy6220_00_0001.jp2')
+      expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0001.jp2')
     end
 
     it 'should return correct file_id from a valid contentMetadata with resource type = page' do
@@ -278,7 +296,7 @@ describe Dor::UpdateMarcRecordService do
       expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.file_id).to eq('|xfile:aa111aa2222%2Fwt183gy6220_00_0002.jp2')
+      expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0002.jp2')
     end
 
     # Added thumb based upon recommendation from Lynn McRae for future use
@@ -292,7 +310,7 @@ describe Dor::UpdateMarcRecordService do
       expect(content_metadata_ds).to receive(:ng_xml).twice.and_return(content_metadata_ng_xml)
 
       updater = Dor::UpdateMarcRecordService.new(d)
-      expect(updater.file_id).to eq('|xfile:bb111bb2222%2Fwt183gy6220_00_0002.jp2')
+      expect(updater.file_id).to eq('|xfile:wt183gy6220_00_0002.jp2')
     end
   end
 
@@ -399,6 +417,29 @@ describe Dor::UpdateMarcRecordService do
 
       updater = Dor::UpdateMarcRecordService.new(dor_item)
       expect(updater.released_to_Searchworks).to be false
+    end
+  end
+
+  describe 'dor_items_for_constituents' do
+    it 'should return empty array if no datastreams' do
+      item = double('item', id: '12345', datastreams: nil)
+      expect(Dor::UpdateMarcRecordService.new(item).send(:dor_items_for_constituents)).to eq([])
+    end
+    it 'should return empty array if no RELS-EXT datastreams' do
+      item = double('item', id: '12345', datastreams: {})
+      expect(Dor::UpdateMarcRecordService.new(item).send(:dor_items_for_constituents)).to eq([])
+    end
+    it 'should return empty array if no RELS-EXT ng_xml' do
+      item = double('item', id: '12345', datastreams: { 'RELS-EXT' => double('xml', ng_xml: nil) })
+      expect(Dor::UpdateMarcRecordService.new(item).send(:dor_items_for_constituents)).to eq([])
+    end
+    it 'successfully determines constituent druid' do
+      rels_ext_xml = double(String, ng_xml: Nokogiri::XML(build_rels_ext))
+
+      item = double('item', id: '12345', datastreams: { 'RELS-EXT' => rels_ext_xml })
+
+      expect(Dor::Item).to receive(:find).with('druid:hj097bm8879')
+      Dor::UpdateMarcRecordService.new(item).send(:dor_items_for_constituents)
     end
   end
 
@@ -593,5 +634,24 @@ describe Dor::UpdateMarcRecordService do
 </file>
 </resource>
 </contentMetadata>'
+  end
+
+  def build_rels_ext
+    '<rdf:RDF xmlns:fedora="info:fedora/fedora-system:def/relations-external#" xmlns:fedora-model="info:fedora/fedora-system:def/model#" xmlns:hydra="http://projecthydra.org/ns/relations#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about="info:fedora/druid:cs003qk0166">
+    <hydra:isGovernedBy rdf:resource="info:fedora/druid:sq161jk2248"/>
+    <fedora-model:hasModel rdf:resource="info:fedora/afmodel:Dor_Item"/>
+    <fedora:isMemberOf rdf:resource="info:fedora/druid:xh235dd9059"/>
+    <fedora:isMemberOfCollection rdf:resource="info:fedora/druid:xh235dd9059"/>
+    <fedora:isConstituentOf rdf:resource="info:fedora/druid:hj097bm8879"/>
+  </rdf:Description>
+</rdf:RDF>'
+  end
+
+  def build_desc_metadata_1
+    '<mods>
+  <titleInfo>
+    <title>Constituent label</title>
+  </titleInfo></mods>'
   end
 end
