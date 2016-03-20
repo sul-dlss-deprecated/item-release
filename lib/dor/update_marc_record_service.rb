@@ -181,12 +181,9 @@ module Dor
     private
 
     def dor_items_for_constituents
-      return [] unless @druid_obj.datastreams
-      return [] unless @druid_obj.datastreams['RELS-EXT']
-      return [] unless @druid_obj.datastreams['RELS-EXT'].ng_xml
-      constituents = @druid_obj.datastreams['RELS-EXT'].ng_xml.xpath('//rdf:RDF/rdf:Description/fedora:isConstituentOf')
-      constituents.map do |cons|
-        cons_druid = cons.attr('rdf:resource').sub('info:fedora/', '')
+      return [] unless @druid_obj.relationships(:is_constituent_of)
+      @druid_obj.relationships(:is_constituent_of).map do |cons|
+        cons_druid = cons.sub('info:fedora/', '')
         Dor::Item.find(cons_druid)
       end
     end
