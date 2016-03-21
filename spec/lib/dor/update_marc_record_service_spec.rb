@@ -421,24 +421,13 @@ describe Dor::UpdateMarcRecordService do
   end
 
   describe 'dor_items_for_constituents' do
-    it 'should return empty array if no datastreams' do
-      item = double('item', id: '12345', datastreams: nil)
-      expect(Dor::UpdateMarcRecordService.new(item).send(:dor_items_for_constituents)).to eq([])
-    end
-    it 'should return empty array if no RELS-EXT datastreams' do
-      item = double('item', id: '12345', datastreams: {})
-      expect(Dor::UpdateMarcRecordService.new(item).send(:dor_items_for_constituents)).to eq([])
-    end
-    it 'should return empty array if no RELS-EXT ng_xml' do
-      item = double('item', id: '12345', datastreams: { 'RELS-EXT' => double('xml', ng_xml: nil) })
+    it 'should return empty array if no relationships' do
+      item = double('item', id: '12345', relationships: nil)
       expect(Dor::UpdateMarcRecordService.new(item).send(:dor_items_for_constituents)).to eq([])
     end
     it 'successfully determines constituent druid' do
-      rels_ext_xml = double(String, ng_xml: Nokogiri::XML(build_rels_ext))
-
-      item = double('item', id: '12345', datastreams: { 'RELS-EXT' => rels_ext_xml })
-
-      expect(Dor::Item).to receive(:find).with('druid:hj097bm8879')
+      item = double('item', id: '12345', relationships: ['info:fedora/druid:mb062dy1188'])
+      expect(Dor::Item).to receive(:find).with('druid:mb062dy1188')
       Dor::UpdateMarcRecordService.new(item).send(:dor_items_for_constituents)
     end
   end
