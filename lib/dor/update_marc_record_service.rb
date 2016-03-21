@@ -100,22 +100,16 @@ module Dor
     # the @id attribute of resource/file elements including extension
     # @return [String] first filename
     def file_id
-      id = nil
-      filename = nil
+      filename = []
       unless @druid_obj.datastreams.nil? || @druid_obj.datastreams['contentMetadata'].nil?
         if @druid_obj.datastreams['contentMetadata'].ng_xml
-          resources = @druid_obj.datastreams['contentMetadata'].ng_xml.xpath('//contentMetadata/resource')
-          resources.detect do |res|
-            # Added thumb based upon recommendation from Lynn McRae for future use
-            children = res.children if %w(image page thumb).include?(res.attr('type'))
-            children.detect do |child|
-              filename = child.attr('id') if child.attr('mimetype') == 'image/jp2'
-            end
+          content_md = @druid_obj.datastreams['contentMetadata'].ng_xml.xpath('//contentMetadata')
+          content_md.xpath('//resource[@type="page" or @type="image" or @type="thumb"]').map do |node|
+            filename += node.xpath('./file[@mimetype="image/jp2"]/@id').map { |x| "#{@druid_id}%2F" + x } << node.xpath('./externalFile[@mimetype="image/jp2"]').map { |y| "#{y.attributes['objectId'].text.split(':').last}" + "%2F" + "#{y.attributes['fileId']}" }
           end
-          id = filename.prepend("|xfile:") unless filename.nil?
         end
       end
-      id
+      filename.detect { |file| file.prepend("|xfile:") unless file.empty? }
     end
 
     # It returns 856 constants
