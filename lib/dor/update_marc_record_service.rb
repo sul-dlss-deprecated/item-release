@@ -105,7 +105,10 @@ module Dor
         if @druid_obj.datastreams['contentMetadata'].ng_xml
           content_md = @druid_obj.datastreams['contentMetadata'].ng_xml.xpath('//contentMetadata')
           content_md.xpath('//resource[@type="page" or @type="image" or @type="thumb"]').map do |node|
-            filename += node.xpath('./file[@mimetype="image/jp2"]/@id').map { |x| "#{@druid_id}%2F" + x } << node.xpath('./externalFile[@mimetype="image/jp2"]').map { |y| "#{y.attributes['objectId'].text.split(':').last}" + "%2F" + "#{y.attributes['fileId']}" }
+            filename += node.xpath('./file[@mimetype="image/jp2"]/@id').map { |x| "#{@druid_id}%2F" + x }
+            if filename.empty?
+              filename += node.xpath('./externalFile[@mimetype="image/jp2"]').map do |y| "#{y.attributes['objectId'].text.split(':').last}" + "%2F" + "#{y.attributes['fileId']}" end
+            end
           end
         end
       end
