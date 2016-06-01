@@ -6,6 +6,11 @@
 
 Robot suite that handles item release and updating PURLs to prepare for indexing.
 
+
+## Documentation
+
+Check the [Wiki](https://github.com/sul-dlss/robot-master/wiki) in the robot-master repo.
+
 ## Dependences
 
 Ruby 2.2.2
