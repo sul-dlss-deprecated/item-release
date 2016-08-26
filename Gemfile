@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'dor-services', '~> 5.5'
+gem 'dor-services', '~> 5.10'
 gem 'lyber-core', '~> 4.0', '>= 4.0.3'
 gem 'robot-controller', '~> 2.0' # requires Resque
 gem 'pry', '~> 0.10.0'          # for bin/console
