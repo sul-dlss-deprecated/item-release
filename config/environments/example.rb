@@ -25,9 +25,6 @@ Dor::Config.configure do
     max_tries  5  # the number of attempts to retry service calls before failing
     max_sleep_seconds   120  # max sleep seconds between tries
     base_sleep_seconds  10   # base sleep seconds between tries       
-    purl_base_uri 'http://purl.stanford.edu/' 
-    symphony_path './'
-    write_marc_script 'bin/write_marc_record_test'
   end
 
   dor do

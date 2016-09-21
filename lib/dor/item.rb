@@ -77,6 +77,18 @@ module Dor::Release
       object_type == 'adminPolicy'
     end
 
+    def update_marc_record
+      handler = proc do |exception, attempt_number, _total_delay|
+        LyberCore::Log.debug "#{exception.class} on dor-services-app update_marc_record call #{attempt_number} for #{@druid}" if attempt_number >= Dor::Config.release.max_tries
+      end
+
+      with_retries(max_tries: Dor::Config.release.max_tries, handler: handler, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
+        url = "#{Dor::Config.dor.service_root}/objects/#{@druid}/update_marc_record"
+        response = RestClient.post url,{}
+        response.code  
+      end
+    end
+    
     def self.add_workflow_for_collection(druid)
       create_workflow(druid)
     end
