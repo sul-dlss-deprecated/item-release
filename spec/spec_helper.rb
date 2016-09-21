@@ -9,6 +9,7 @@ require bootfile
 
 require 'pry'
 require 'rspec'
+require 'webmock/rspec'
 
 def setup_work_item(druid)
   @work_item=double("work_item")

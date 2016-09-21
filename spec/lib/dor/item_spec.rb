@@ -62,6 +62,13 @@ describe Dor::Release::Item do
     expect(Dor::Config.workflow.client).to receive(:update_workflow_status).exactly(1).times
     Dor::Release::Item.add_workflow_for_item(@druid)
   end
+  
+  it 'should make a webservice call for updating_marc_records' do
+    stub_request(:post, "https://example.com/dor/v1/objects/oo000oo0001/update_marc_record").
+             with(headers: {'Accept' => '*/*; q=0.5, application/xml', 'Accept-Encoding' => 'gzip, deflate', 'Authorization' => 'Basic VVNFUk5BTUU6UEFTU1dPUkQ='}).
+             to_return(status: 201, body: "", headers: {})
+    expect(@item.update_marc_record).to eq(201)
+  end
 
   it 'should return correct object types, assuming the values are set in the identityMetadata correctly' do
     allow(@item).to receive(:object_type).and_return('item')
