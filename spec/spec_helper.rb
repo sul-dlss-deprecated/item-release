@@ -1,8 +1,14 @@
 # Make sure specs run with the definitions from test.rb
 ENV['ROBOT_ENVIRONMENT'] = 'test'
 
+require 'simplecov'
 require 'coveralls'
 Coveralls.wear!
+
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  SimpleCov::Formatter::HTMLFormatter,
+  Coveralls::SimpleCov::Formatter
+]
 
 bootfile = File.expand_path(File.dirname(__FILE__) + '/../config/boot')
 require bootfile

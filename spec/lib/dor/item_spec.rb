@@ -49,7 +49,7 @@ describe Dor::Release::Item do
   it 'should get the right value for sub_collections' do
     expect(@item.sub_collections).to eq @response['sets'] + @response['collections']
   end
-
+  
   it 'should add the workflow for a collection' do
     expect(Dor::Item).to receive(:find).with(@druid).and_return(@dor_object).exactly(1).times
     expect(@dor_object).to receive(:initialize_workflow).with(Dor::Config.release.workflow_name).exactly(1).times
@@ -67,29 +67,36 @@ describe Dor::Release::Item do
     stub_request(:post, "https://example.com/dor/v1/objects/oo000oo0001/update_marc_record").
              with(headers: {'Accept' => '*/*; q=0.5, application/xml', 'Accept-Encoding' => 'gzip, deflate', 'Authorization' => 'Basic VVNFUk5BTUU6UEFTU1dPUkQ='}).
              to_return(status: 201, body: "", headers: {})
+    #TODO: confirm RestClient call is made?
     expect(@item.update_marc_record).to eq(201)
   end
 
-  it 'should return correct object types, assuming the values are set in the identityMetadata correctly' do
-    allow(@item).to receive(:object_type).and_return('item')
+  it 'should return correct object types for an item' do
+    allow(@dor_object).to receive(:identityMetadata).and_return(Dor::IdentityMetadataDS.from_xml('<identityMetadata><objectType>item</objectType></identityMetadata>'))
     expect(@item.is_item?).to be_truthy
     expect(@item.is_collection?).to be_falsey
     expect(@item.is_set?).to be_falsey
     expect(@item.is_apo?).to be_falsey
+  end
 
-    allow(@item).to receive(:object_type).and_return('set')
+  it 'should return correct object types for a set' do
+    allow(@dor_object).to receive(:identityMetadata).and_return(Dor::IdentityMetadataDS.from_xml('<identityMetadata><objectType>set</objectType></identityMetadata>'))
     expect(@item.is_item?).to be_falsey
     expect(@item.is_collection?).to be_falsey
     expect(@item.is_set?).to be_truthy
     expect(@item.is_apo?).to be_falsey
+  end
 
-    allow(@item).to receive(:object_type).and_return('collection')
+  it 'should return correct object types for a collection' do
+    allow(@dor_object).to receive(:identityMetadata).and_return(Dor::IdentityMetadataDS.from_xml('<identityMetadata><objectType>collection</objectType></identityMetadata>'))
     expect(@item.is_item?).to be_falsey
     expect(@item.is_collection?).to be_truthy
     expect(@item.is_set?).to be_falsey
     expect(@item.is_apo?).to be_falsey
+  end
 
-    allow(@item).to receive(:object_type).and_return('adminPolicy')
+  it 'should return correct object types for an apo' do
+    allow(@dor_object).to receive(:identityMetadata).and_return(Dor::IdentityMetadataDS.from_xml('<identityMetadata><objectType>adminPolicy</objectType></identityMetadata>'))
     expect(@item.is_item?).to be_falsey
     expect(@item.is_collection?).to be_falsey
     expect(@item.is_set?).to be_falsey

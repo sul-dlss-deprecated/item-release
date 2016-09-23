@@ -62,19 +62,19 @@ module Dor::Release
     end
 
     def is_item?
-      object_type == 'item'
+      object_type.downcase  == 'item'
     end
 
     def is_collection?
-      object_type == 'collection'
+      object_type.downcase  == 'collection'
     end
 
     def is_set?
-      object_type == 'set'
+      object_type.downcase  == 'set'
     end
 
     def is_apo?
-      object_type == 'adminPolicy'
+      object_type.downcase == 'adminpolicy'
     end
 
     def update_marc_record
