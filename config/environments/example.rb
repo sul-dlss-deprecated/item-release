@@ -30,6 +30,16 @@ Dor::Config.configure do
     write_marc_script 'bin/write_marc_record_test'
   end
 
+  stacks do
+    document_cache_storage_root '/purl/document_cache'
+    document_cache_host 'purl.stanford.edu'
+    local_workspace_root '/dor/workspace'
+    local_stacks_root '/stacks'
+    local_document_cache_root '/purl/document_cache'
+    url 'https://stacks.stanford.edu'
+    iiif_profile 'http://iiif.io/api/image/2/level1.json'
+  end
+  
   dor do
     service_root 'https://USERNAME:PASSWORD@example.com/dor/v1'
   end
