@@ -414,7 +414,7 @@ describe Dor::UpdateMarcRecordService do
   end
 
   describe 'Released to Searchworks' do
-    it 'should return true if release_data tag has release to=SW and value is true' do
+    it 'should return true if release_data tag has release to=Searchworks and value is true' do
       identity_metadata_xml = double('Identity Metadata', ng_xml: Nokogiri::XML(build_identity_metadata_1))
       dor_item = double('Dor Item', id: 'aa111aa1111', identityMetadata: identity_metadata_xml)
       release_data = { 'Searchworks' => { 'release' => true } }
@@ -422,7 +422,23 @@ describe Dor::UpdateMarcRecordService do
       updater = Dor::UpdateMarcRecordService.new(dor_item)
       expect(updater.released_to_Searchworks).to be true
     end
-    it 'should return false if release_data tag has release to=SW and value is false' do
+    it 'should return true if release_data tag has release to=searchworks (all lowercase) and value is true' do
+      identity_metadata_xml = double('Identity Metadata', ng_xml: Nokogiri::XML(build_identity_metadata_1))
+      dor_item = double('Dor Item', id: 'aa111aa1111', identityMetadata: identity_metadata_xml)
+      release_data = { 'searchworks' => { 'release' => true } }
+      allow(dor_item).to receive(:released_for).and_return(release_data)
+      updater = Dor::UpdateMarcRecordService.new(dor_item)
+      expect(updater.released_to_Searchworks).to be true
+    end
+    it 'should return true if release_data tag has release to=SearchWorks (camcelcase) and value is true' do
+      identity_metadata_xml = double('Identity Metadata', ng_xml: Nokogiri::XML(build_identity_metadata_1))
+      dor_item = double('Dor Item', id: 'aa111aa1111', identityMetadata: identity_metadata_xml)
+      release_data = { 'SearchWorks' => { 'release' => true } }
+      allow(dor_item).to receive(:released_for).and_return(release_data)
+      updater = Dor::UpdateMarcRecordService.new(dor_item)
+      expect(updater.released_to_Searchworks).to be true
+    end
+    it 'should return false if release_data tag has release to=Searchworks and value is false' do
       identity_metadata_xml = double('Identity Metadata', ng_xml: Nokogiri::XML(build_identity_metadata_2))
       dor_item = double('Dor Item', id: 'aa111aa1111', identityMetadata: identity_metadata_xml)
       release_data = { 'Searchworks' => { 'release' => false } }
@@ -430,7 +446,7 @@ describe Dor::UpdateMarcRecordService do
       updater = Dor::UpdateMarcRecordService.new(dor_item)
       expect(updater.released_to_Searchworks).to be false
     end
-    it 'should return false if release_data tag has release to=SW but no specified release value' do
+    it 'should return false if release_data tag has release to=Searchworks but no specified release value' do
       identity_metadata_xml = double('Identity Metadata', ng_xml: Nokogiri::XML(build_identity_metadata_2))
       dor_item = double('Dor Item', id: 'aa111aa1111', identityMetadata: identity_metadata_xml)
       release_data = { 'Searchworks' => { 'bogus' => 'yup' } }
