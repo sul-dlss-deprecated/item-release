@@ -9,7 +9,7 @@ describe Robots::DorRepo::Release::UpdateMarc do
   end
 
   it "calls the update marc record method" do
-    setup_release_item(@druid,:item)
+    setup_release_item(@druid,:item,nil,nil)
     expect(@release_item).to receive(:update_marc_record)
     @r.perform(@work_item)
   end
