@@ -9,7 +9,7 @@ describe Robots::DorRepo::Release::ReleasePublish do
   end  
 
   it "should run the robot, calling publish metadata on the dor item" do
-    setup_release_item(@druid,:item)
+    setup_release_item(@druid,:item,nil,nil)
     expect(@dor_item).to receive(:publish_metadata).once
     @r.perform(@work_item)
   end

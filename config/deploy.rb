@@ -6,10 +6,10 @@ set :repo_url, 'https://github.com/sul-dlss/item-release.git'
 
 set :home_directory, "/home/lyberadmin"
 
-set :branch, 'master'
+#set :branch, 'master'
 
 # Default branch is :master
-# ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
+ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
 
 # Default deploy_to directory is /var/www/my_app
 set :deploy_to, "#{fetch(:home_directory)}/#{fetch(:application)}"
@@ -29,7 +29,7 @@ set :log_level, :info
 # set :pty, true
 
 # Default value for :linked_files is []
-set :linked_files, %w{bin/write_marc_record}
+# set :linked_files, []
 
 # Default value for linked_dirs is []
 # set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
@@ -45,12 +45,6 @@ set :default_stage, "development"
 set :linked_dirs, %w(log run config/environments config/certs)
 
 namespace :deploy do
-  desc 'Make write_marc_record script executable.'
-  task :chnage_script_mode do
-    on roles(:app), in: :sequence, wait: 10 do
-        execute :chmod, "u+x", release_path.join("bin/write_marc_record")
-    end
-  end
 
   desc 'Restart application'
   task :restart do
@@ -70,6 +64,5 @@ namespace :deploy do
   end
 
   after :publishing, :restart
-  after :restart, :chnage_script_mode
 
 end

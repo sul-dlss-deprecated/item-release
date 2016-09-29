@@ -10,13 +10,13 @@ describe Robots::DorRepo::Release::ReleaseMembers do
   end  
 
   it "should run the robot" do
-    setup_release_item(@druid,:item)
+    setup_release_item(@druid,:item,nil,nil)
     @r.perform(@work_item)
   end
 
   it "should run the robot for an item or an apo and do nothing as a result" do
     %w{:item :apo}.each do |item_type|
-      setup_release_item(@druid,item_type)
+      setup_release_item(@druid,item_type,nil,nil)
       expect(@release_item.is_collection?).to be false # definitely not a collection
       expect(@r).to_not receive(:item_members) # we won't bother looking for item members if this is an item
       @r.perform(@work_item)
@@ -28,12 +28,25 @@ describe Robots::DorRepo::Release::ReleaseMembers do
      {"druid"=>"druid:bb023nj3137", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"Snetterton Vanwall Trophy: 1958", "catkey"=>"3051732"},
      {"druid"=>"druid:bb027yn4436", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"Crystal Palace BARC: 1954", "catkey"=>"3051733"},
      {"druid"=>"druid:bb048rn5648", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"", "catkey"=>"3051734"}]
-    setup_release_item(@druid,:collection,item_members)
+    setup_release_item(@druid,:collection,item_members,nil)
     expect(@release_item.is_collection?).to be true
     expect(@release_item.item_members).to eq(item_members)
     expect(@release_item).to receive(:item_members).twice # we should be looking up the members (first time to see if any items exist, second type to iterate)
     expect(Dor::Release::Item).to receive(:add_workflow_for_item).exactly(4).times
     @r.perform(@work_item)
   end
-    
+
+  it "should run for a collection and execute the sub_collection method" do
+    collections=[{"druid"=>"druid:bb001zc5754"},
+                 {"druid"=>"druid:bb023nj3137"}]
+    setup_release_item(@druid,:collection,nil,collections)
+    expect(@release_item.is_collection?).to be true
+    expect(@release_item.item_members).to eq(nil)
+    expect(@release_item.sub_collections).to eq(collections)
+    expect(@release_item).to receive(:item_members).once
+    expect(@release_item).to receive(:sub_collections).twice
+    expect(Dor::Release::Item).to receive(:add_workflow_for_collection).exactly(2).times
+    @r.perform(@work_item)
+  end
+      
 end

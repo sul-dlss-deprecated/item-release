@@ -27,6 +27,17 @@ Dor::Config.configure do
     base_sleep_seconds  10   # base sleep seconds between tries    
   end
 
+  stacks do
+    document_cache_storage_root '/purl/document_cache'
+    document_cache_host 'purl.stanford.edu'
+    local_workspace_root '/dor/workspace'
+    local_stacks_root '/stacks'
+    local_document_cache_root '/purl/document_cache'
+    local_recent_changes '/purl/recent_changes'
+    url 'https://stacks-test.stanford.edu'
+    iiif_profile 'http://iiif.io/api/image/2/level1.json'
+  end
+  
   dor do
     service_root 'https://USERNAME:PASSWORD@example.com/dor/v1'
   end
