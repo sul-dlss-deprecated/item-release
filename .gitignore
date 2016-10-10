@@ -11,6 +11,7 @@ pid
 config/certs
 config/environments/development.rb
 config/environments/production.rb
+config/environments/stage.rb
 .rvmrc
 .DS_Store
 .ruby-version

@@ -23,12 +23,38 @@ describe Robots::DorRepo::Release::ReleaseMembers do
     end
   end
   
-  it "should run for a collection and execute the item_members method" do
+  it "should run for a collection but never add workflow or ask for item members when the collection is released to self only" do
+    item_members=[{"druid"=>"druid:bb001zc5754", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"French Grand Prix and 12 Hour Rheims: 1954", "catkey"=>"3051728"}]
+    setup_release_item(@druid,:collection,item_members,nil)
+    allow(@dor_item).to receive_messages(:get_newest_release_tag=>{"SearchWorks"=>{"release"=>true, "what"=>"self", "when"=>"2016-10-07 19:34:43 UTC", "who"=>"lmcrae"}})
+    allow(@dor_item).to receive_messages(:release_tags=>{"SearchWorks"=>[{"release"=>true, "what"=>"self", "when"=>"2016-10-07 19:34:43 UTC", "who"=>"lmcrae"}]})
+    expect(@release_item.is_collection?).to be true
+    expect(@release_item.item_members).to eq(item_members)
+    expect(@release_item).to_not receive(:item_members)
+    expect(Dor::Release::Item).to_not receive(:add_workflow_for_item)
+    @r.perform(@work_item)
+  end
+
+  it "should run for a collection but never add workflow or ask for item members when there are multiple targets but they are all released to self only" do
+    item_members=[{"druid"=>"druid:bb001zc5754", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"French Grand Prix and 12 Hour Rheims: 1954", "catkey"=>"3051728"}]
+    setup_release_item(@druid,:collection,item_members,nil)
+    allow(@dor_item).to receive_messages(:get_newest_release_tag=>{"SearchWorks"=>{"release"=>true, "what"=>"self", "when"=>"2016-10-07 19:34:43 UTC", "who"=>"lmcrae"},"Revs"=>{"release"=>true, "what"=>"self", "when"=>"2016-10-07 19:34:43 UTC", "who"=>"petucket"}})
+    allow(@dor_item).to receive_messages(:release_tags=>{"SearchWorks"=>[{"release"=>true, "what"=>"self", "when"=>"2016-10-07 19:34:43 UTC", "who"=>"lmcrae"},"Revs"=>{"release"=>true, "what"=>"self", "when"=>"2016-10-07 19:34:43 UTC", "who"=>"petucket"}]})
+    expect(@release_item.is_collection?).to be true
+    expect(@release_item.item_members).to eq(item_members)
+    expect(@release_item).to_not receive(:item_members)
+    expect(Dor::Release::Item).to_not receive(:add_workflow_for_item)
+    @r.perform(@work_item)
+  end
+  
+  it "should run for a collection and execute the item_members method when the collection is not released to self" do
     item_members=[{"druid"=>"druid:bb001zc5754", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"French Grand Prix and 12 Hour Rheims: 1954", "catkey"=>"3051728"},
      {"druid"=>"druid:bb023nj3137", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"Snetterton Vanwall Trophy: 1958", "catkey"=>"3051732"},
      {"druid"=>"druid:bb027yn4436", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"Crystal Palace BARC: 1954", "catkey"=>"3051733"},
      {"druid"=>"druid:bb048rn5648", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"", "catkey"=>"3051734"}]
     setup_release_item(@druid,:collection,item_members,nil)
+    allow(@dor_item).to receive_messages(:get_newest_release_tag=>{"SearchWorks"=>{"release"=>true, "what"=>"collection", "when"=>"2016-10-07 19:34:43 UTC", "who"=>"lmcrae"}})
+    allow(@dor_item).to receive_messages(:release_tags=>{"SearchWorks"=>[{"release"=>true, "what"=>"collection", "when"=>"2016-10-07 19:34:43 UTC", "who"=>"lmcrae"}]})
     expect(@release_item.is_collection?).to be true
     expect(@release_item.item_members).to eq(item_members)
     expect(@release_item).to receive(:item_members).twice # we should be looking up the members (first time to see if any items exist, second type to iterate)
@@ -36,10 +62,27 @@ describe Robots::DorRepo::Release::ReleaseMembers do
     @r.perform(@work_item)
   end
 
+  it "should run for a collection and execute the item_members method when there are multiple targets and at least one of the release tagets is not released to self" do
+    item_members=[{"druid"=>"druid:bb001zc5754", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"French Grand Prix and 12 Hour Rheims: 1954", "catkey"=>"3051728"},
+     {"druid"=>"druid:bb023nj3137", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"Snetterton Vanwall Trophy: 1958", "catkey"=>"3051732"},
+     {"druid"=>"druid:bb027yn4436", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"Crystal Palace BARC: 1954", "catkey"=>"3051733"},
+     {"druid"=>"druid:bb048rn5648", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"", "catkey"=>"3051734"}]
+    setup_release_item(@druid,:collection,item_members,nil)
+    allow(@dor_item).to receive_messages(:get_newest_release_tag=>{"SearchWorks"=>{"release"=>true, "what"=>"collection", "when"=>"2016-10-07 19:34:43 UTC", "who"=>"lmcrae"},"Revs"=>{"release"=>true, "what"=>"self", "when"=>"2016-10-07 19:34:43 UTC", "who"=>"petucket"}})
+    allow(@dor_item).to receive_messages(:release_tags=>{"SearchWorks"=>[{"release"=>true, "what"=>"collection", "when"=>"2016-10-07 19:34:43 UTC", "who"=>"lmcrae"},"Revs"=>{"release"=>true, "what"=>"self", "when"=>"2016-10-07 19:34:43 UTC", "who"=>"petucket"}]})
+    expect(@release_item.is_collection?).to be true
+    expect(@release_item.item_members).to eq(item_members)
+    expect(@release_item).to receive(:item_members).twice # we should be looking up the members (first time to see if any items exist, second type to iterate)
+    expect(Dor::Release::Item).to receive(:add_workflow_for_item).exactly(4).times
+    @r.perform(@work_item)
+  end
+    
   it "should run for a collection and execute the sub_collection method" do
     collections=[{"druid"=>"druid:bb001zc5754"},
                  {"druid"=>"druid:bb023nj3137"}]
     setup_release_item(@druid,:collection,nil,collections)
+    allow(@dor_item).to receive_messages(:get_newest_release_tag=>{"SearchWorks"=>{"release"=>true, "what"=>"collection", "when"=>"2016-10-07 19:34:43 UTC", "who"=>"lmcrae"}})
+    allow(@dor_item).to receive_messages(:release_tags=>{"SearchWorks"=>[{"release"=>true, "what"=>"collection", "when"=>"2016-10-07 19:34:43 UTC", "who"=>"lmcrae"}]})
     expect(@release_item.is_collection?).to be true
     expect(@release_item.item_members).to eq(nil)
     expect(@release_item.sub_collections).to eq(collections)
