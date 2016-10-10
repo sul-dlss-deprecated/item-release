@@ -31,7 +31,7 @@ module Robots       # Robot package
             # check to see if all of the release tags for all targets are what=self, if so, we can skip adding workflow for all the members
             #   if at least one of the targets is *not* what=self, we will do it
             release_tags=item.object.get_newest_release_tag(item.object.release_tags) # get the latest release tag for each target
-            if release_tags.collect {|k,v| v['what']=='self'}.include?(false) # if there are any *non* what=self release tags in any targets, go ahead and add the workflow to the items
+            if release_tags.collect {|_k,v| v['what']=='self'}.include?(false) # if there are any *non* what=self release tags in any targets, go ahead and add the workflow to the items
               
               LyberCore::Log.debug "...fetching members of #{item.object_type}"
               if item.item_members # if there are any members, iterate through and add item workflows (which includes setting the first step to completed)
