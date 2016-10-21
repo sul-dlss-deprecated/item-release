@@ -8,6 +8,7 @@ gem 'slop', '>= 3.5.0'          # for bin/run_robot
 gem 'rake', '>= 10.3.2'
 gem 'dor-fetcher'
 gem 'retries'
+gem 'bluepill', git: 'https://github.com/bluepill-rb/bluepill.git'
 
 group :development, :test do
   gem 'coveralls', require: false
