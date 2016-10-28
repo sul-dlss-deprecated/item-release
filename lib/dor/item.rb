@@ -34,7 +34,7 @@ module Dor::Release
     end
 
     def item_members
-      members['items']
+      members['items'] || []
     end
 
     def sub_collections
@@ -42,6 +42,7 @@ module Dor::Release
         @sub_collections = []
         @sub_collections += members['sets'] if members['sets']
         @sub_collections += members['collections'] if members['collections']
+        @sub_collections.delete_if {|collection| collection['druid'] == druid} # if this is a collection, do not include yourself in the sub-collection list
       end
       @sub_collections
     end
