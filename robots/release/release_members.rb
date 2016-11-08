@@ -16,9 +16,6 @@ module Robots       # Robot package
         #
         # @param [String] druid -- the Druid identifier for the object to process
         def perform(druid)
-          handler = proc do |exception, attempt_number, _total_delay|
-            LyberCore::Log.debug "#{exception.class} on dor-workflow-service call #{attempt_number} for #{@druid}" if attempt_number >= Dor::Config.release.max_tries
-          end
 
           LyberCore::Log.debug "release-members working on #{druid}"
 
@@ -37,7 +34,7 @@ module Robots       # Robot package
               if item.item_members # if there are any members, iterate through and add item workflows (which includes setting the first step to completed)
 
                 item.item_members.each do |item_member|
-                  with_retries(max_tries: Dor::Config.release.max_tries, handler: handler, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
+                  with_retries(max_tries: Dor::Config.release.max_tries, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
                     Dor::Release::Item.add_workflow_for_item(item_member['druid'])
                   end
                 end
@@ -57,7 +54,7 @@ module Robots       # Robot package
             if item.sub_collections # if there are any sub-collections, iterate through and add collection workflows
 
               item.sub_collections.each do |sub_collection|
-                with_retries(max_tries: Dor::Config.release.max_tries, handler: handler, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
+                with_retries(max_tries: Dor::Config.release.max_tries, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
                   Dor::Release::Item.add_workflow_for_collection(sub_collection['druid'])
                 end
               end
