@@ -18,11 +18,7 @@ module Dor::Release
     def members
       unless @members # if members have not been fetched and cached for this object yet, fetch them
 
-        handler = proc do |exception, attempt_number, _total_delay|
-          LyberCore::Log.debug "#{exception.class} on dor-fetcher-service get members call #{attempt_number} for #{@druid}" if attempt_number >= Dor::Config.release.max_tries
-        end
-
-        with_retries(max_tries: Dor::Config.release.max_tries, handler: handler, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
+        with_retries(max_tries: Dor::Config.release.max_tries, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
           @members = @fetcher.get_collection(@druid) # cache members in an instance variable
         end
 
@@ -79,11 +75,7 @@ module Dor::Release
     end
 
     def update_marc_record
-      handler = proc do |exception, attempt_number, _total_delay|
-        LyberCore::Log.debug "#{exception.class} on dor-services-app update_marc_record call #{attempt_number} for #{@druid}" if attempt_number >= Dor::Config.release.max_tries
-      end
-
-      with_retries(max_tries: Dor::Config.release.max_tries, handler: handler, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
+      with_retries(max_tries: Dor::Config.release.max_tries, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
         url = "#{Dor::Config.dor.service_root}/objects/#{@druid}/update_marc_record"
         response = RestClient.post url,{}
         response.code  
@@ -100,28 +92,20 @@ module Dor::Release
     end
 
     def self.create_workflow(druid)
-      handler = proc do |exception, attempt_number, _total_delay|
-        LyberCore::Log.debug "#{exception.class} on initialize workflow attempt #{attempt_number} for #{druid}" if attempt_number >= Dor::Config.release.max_tries
-      end
-
       LyberCore::Log.debug "...adding workflow #{Dor::Config.release.workflow_name} for #{druid}"
 
       # initiate workflow
-      with_retries(max_tries: Dor::Config.release.max_tries, handler: handler, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
+      with_retries(max_tries: Dor::Config.release.max_tries, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
         obj = Dor::Item.find(druid)
         obj.initialize_workflow(Dor::Config.release.workflow_name)
       end
     end
 
     def self.set_release_to_completed(druid)
-      handler = proc do |exception, attempt_number, _total_delay|
-        LyberCore::Log.debug "#{exception.class} on workflow service attempt #{attempt_number} for #{druid}" if attempt_number >= Dor::Config.release.max_tries
-      end
-
       LyberCore::Log.debug "...setting release to completed in #{Dor::Config.release.workflow_name} for #{druid}"
 
-      # set release-members step to completed
-      with_retries(max_tries: Dor::Config.release.max_tries, handler: handler, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
+      # set release-members step to skipped
+      with_retries(max_tries: Dor::Config.release.max_tries, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
         Dor::Config.workflow.client.update_workflow_status 'dor', druid, Dor::Config.release.workflow_name, 'release-members', 'skipped'
       end
     end
