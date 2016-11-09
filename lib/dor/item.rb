@@ -88,7 +88,6 @@ module Dor::Release
 
     def self.add_workflow_for_item(druid)
       create_workflow(druid)
-      set_release_to_completed(druid)
     end
 
     def self.create_workflow(druid)
@@ -101,13 +100,5 @@ module Dor::Release
       end
     end
 
-    def self.set_release_to_completed(druid)
-      LyberCore::Log.debug "...setting release to completed in #{Dor::Config.release.workflow_name} for #{druid}"
-
-      # set release-members step to skipped
-      with_retries(max_tries: Dor::Config.release.max_tries, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
-        Dor::Config.workflow.client.update_workflow_status 'dor', druid, Dor::Config.release.workflow_name, 'release-members', 'skipped'
-      end
-    end
   end # class Item
 end # module
