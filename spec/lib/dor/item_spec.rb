@@ -59,7 +59,6 @@ describe Dor::Release::Item do
   it 'should add the workflow for an item' do
     expect(Dor::Item).to receive(:find).with(@druid).and_return(@dor_object).exactly(1).times
     expect(@dor_object).to receive(:initialize_workflow).with(Dor::Config.release.workflow_name).exactly(1).times
-    expect(Dor::Config.workflow.client).to receive(:update_workflow_status).exactly(1).times
     Dor::Release::Item.add_workflow_for_item(@druid)
   end
   
