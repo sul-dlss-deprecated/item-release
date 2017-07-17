@@ -43,6 +43,7 @@ set :log_level, :info
 set :stages, %W(development staging production)
 set :default_stage, "development"
 set :linked_dirs, %w(log run config/environments config/certs)
+set :linked_files, %w(config/honeybadger.yml)
 
 namespace :deploy do
 
@@ -66,3 +67,5 @@ namespace :deploy do
   after :publishing, :restart
 
 end
+
+set :honeybadger_env, fetch(:stage)
