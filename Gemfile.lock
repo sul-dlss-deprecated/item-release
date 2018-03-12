@@ -402,7 +402,6 @@ GEM
     whenever (0.9.7)
       chronic (>= 0.6.3)
     xml-simple (1.1.5)
-    yard (0.9.5)
 
 PLATFORMS
   ruby
@@ -427,7 +426,6 @@ DEPENDENCIES
   slop (>= 3.5.0)
   vcr
   webmock
-  yard
 
 BUNDLED WITH
    1.16.0
