@@ -14,7 +14,7 @@ group :development, :test do
   gem 'coveralls', require: false
   gem 'vcr'
   gem 'rspec'
-  gem 'rubocop', '0.37.2'
+  gem 'rubocop', '~> 0.52.1'
   gem 'rubocop-rspec'
   gem 'webmock'
 end
