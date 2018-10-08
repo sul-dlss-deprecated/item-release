@@ -96,7 +96,7 @@ module Dor::Release
       # initiate workflow
       with_retries(max_tries: Dor::Config.release.max_tries, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
         obj = Dor.find(druid)
-        obj.initialize_workflow(Dor::Config.release.workflow_name)
+        obj.create_workflow(Dor::Config.release.workflow_name)
       end
     end
 
