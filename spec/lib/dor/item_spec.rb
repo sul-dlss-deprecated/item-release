@@ -12,8 +12,8 @@ describe Dor::Release::Item do
     allow(@client).to receive(:get_collection).and_return(@response)
     @item.fetcher = @client
 
-    @dor_object = double(Dor::Item)
-    allow(Dor::Item).to receive(:find).and_return(@dor_object)
+    @dor_object = double(Dor)
+    allow(Dor).to receive(:find).and_return(@dor_object)
     allow(@dor_object).to receive(:initialize_workflow).and_return(true)
     allow(Dor::Config.workflow.client).to receive(:update_workflow_status).and_return(true)
   end
@@ -22,8 +22,8 @@ describe Dor::Release::Item do
     expect(@item.druid).to eq @druid
   end
 
-  it 'should call dor::item.find, but only once' do
-    expect(Dor::Item).to receive(:find).with(@druid).and_return(@dor_object).exactly(1).times
+  it 'should call Dor.find, but only once' do
+    expect(Dor).to receive(:find).with(@druid).and_return(@dor_object).exactly(1).times
     while @n < 3
       expect(@item.object).to eq @dor_object
       @n += 1
@@ -49,19 +49,19 @@ describe Dor::Release::Item do
   it 'should get the right value for sub_collections' do
     expect(@item.sub_collections).to eq @response['sets'] + @response['collections']
   end
-  
+
   it 'should add the workflow for a collection' do
-    expect(Dor::Item).to receive(:find).with(@druid).and_return(@dor_object).exactly(1).times
+    expect(Dor).to receive(:find).with(@druid).and_return(@dor_object).exactly(1).times
     expect(@dor_object).to receive(:initialize_workflow).with(Dor::Config.release.workflow_name).exactly(1).times
     Dor::Release::Item.add_workflow_for_collection(@druid)
   end
 
   it 'should add the workflow for an item' do
-    expect(Dor::Item).to receive(:find).with(@druid).and_return(@dor_object).exactly(1).times
+    expect(Dor).to receive(:find).with(@druid).and_return(@dor_object).exactly(1).times
     expect(@dor_object).to receive(:initialize_workflow).with(Dor::Config.release.workflow_name).exactly(1).times
     Dor::Release::Item.add_workflow_for_item(@druid)
   end
-  
+
   it 'should make a webservice call for updating_marc_records' do
     stub_request(:post, "https://example.com/dor/v1/objects/oo000oo0001/update_marc_record").
              with(headers: {'Accept' => '*/*', 'Accept-Encoding' => 'gzip, deflate', 'Authorization' => 'Basic VVNFUk5BTUU6UEFTU1dPUkQ='}).
