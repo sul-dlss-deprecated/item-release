@@ -30,7 +30,7 @@ end
 
 def setup_release_item(druid,obj_type,members)
   @release_item=Dor::Release::Item.new(:druid=>druid,:skip_heartbeat=>true)
-  @dor_item=double(Dor::Item)
+  @dor_item=double(Dor)
   allow(@dor_item).to receive_messages(
     :publish_metadata=>nil,
     :id=>druid

@@ -12,7 +12,7 @@ module Dor::Release
     end
 
     def object
-      @fobj ||= Dor::Item.find(@druid)
+      @object ||= Dor.find(@druid)
     end
 
     def members
@@ -78,10 +78,10 @@ module Dor::Release
       with_retries(max_tries: Dor::Config.release.max_tries, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
         url = "#{Dor::Config.dor.service_root}/objects/#{@druid}/update_marc_record"
         response = RestClient.post url,{}
-        response.code  
+        response.code
       end
     end
-    
+
     def self.add_workflow_for_collection(druid)
       create_workflow(druid)
     end
@@ -95,8 +95,8 @@ module Dor::Release
 
       # initiate workflow
       with_retries(max_tries: Dor::Config.release.max_tries, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
-        obj = Dor::Item.find(druid)
-        obj.initialize_workflow(Dor::Config.release.workflow_name)
+        obj = Dor.find(druid)
+        obj.create_workflow(Dor::Config.release.workflow_name)
       end
     end
 
