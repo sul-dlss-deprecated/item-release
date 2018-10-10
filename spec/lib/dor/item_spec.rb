@@ -50,12 +50,12 @@ describe Dor::Release::Item do
   end
 
   it 'should add the workflow for a collection' do
-    expect(Dor::Config.workflow.client).to receive(:create_workflow).exactly(1).times
+    expect(Dor::Config.workflow.client).to receive(:create_workflow).with('dor', @druid, Dor::Config.release.workflow_name, Dor::WorkflowObject.initial_workflow(Dor::Config.release.workflow_name), {}).exactly(1).times
     Dor::Release::Item.add_workflow_for_collection(@druid)
   end
 
   it 'should add the workflow for an item' do
-    expect(Dor::Config.workflow.client).to receive(:create_workflow).exactly(1).times
+    expect(Dor::Config.workflow.client).to receive(:create_workflow).with('dor', @druid, Dor::Config.release.workflow_name, Dor::WorkflowObject.initial_workflow(Dor::Config.release.workflow_name), {}).exactly(1).times
     Dor::Release::Item.add_workflow_for_item(@druid)
   end
 
