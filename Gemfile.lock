@@ -328,7 +328,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bluepill
   capistrano (~> 3.0)
   capistrano-bundler (~> 1.1)
   coveralls
