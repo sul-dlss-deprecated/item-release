@@ -14,8 +14,8 @@ describe Dor::Release::Item do
 
     @dor_object = double(Dor)
     allow(Dor).to receive(:find).and_return(@dor_object)
-    allow(@dor_object).to receive(:create_workflow).and_return(true)
-    allow(Dor::Config.workflow.client).to receive(:update_workflow_status).and_return(true)
+    allow(Dor::WorkflowObject).to receive(:initial_workflow).with(Dor::Config.release.workflow_name).and_return(true)
+    allow(Dor::WorkflowObject).to receive(:initial_repo).with(Dor::Config.release.workflow_name).and_return(true)
   end
 
   it 'should initialize' do
@@ -51,14 +51,12 @@ describe Dor::Release::Item do
   end
 
   it 'should add the workflow for a collection' do
-    expect(Dor).to receive(:find).with(@druid).and_return(@dor_object).exactly(1).times
-    expect(@dor_object).to receive(:create_workflow).with(Dor::Config.release.workflow_name).exactly(1).times
+    expect(Dor::Config.workflow.client).to receive(:create_workflow).with(Dor::WorkflowObject.initial_repo(Dor::Config.release.workflow_name), @druid, Dor::Config.release.workflow_name, Dor::WorkflowObject.initial_workflow(Dor::Config.release.workflow_name), {}).exactly(1).times
     Dor::Release::Item.add_workflow_for_collection(@druid)
   end
 
   it 'should add the workflow for an item' do
-    expect(Dor).to receive(:find).with(@druid).and_return(@dor_object).exactly(1).times
-    expect(@dor_object).to receive(:create_workflow).with(Dor::Config.release.workflow_name).exactly(1).times
+    expect(Dor::Config.workflow.client).to receive(:create_workflow).with(Dor::WorkflowObject.initial_repo(Dor::Config.release.workflow_name), @druid, Dor::Config.release.workflow_name, Dor::WorkflowObject.initial_workflow(Dor::Config.release.workflow_name), {}).exactly(1).times
     Dor::Release::Item.add_workflow_for_item(@druid)
   end
 
