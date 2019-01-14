@@ -4,10 +4,10 @@ describe Robots::DorRepo::Release::ReleaseMembers do
 
   before :each do
     @druid='druid:aa222cc3333'
-    setup_work_item(@druid)
+    @work_item = instance_double(Dor::Item)
     @r = Robots::DorRepo::Release::ReleaseMembers.new
     allow(RestClient).to receive_messages(:post=>nil,:get=>nil,:put=>nil) # don't actually make the RestClient calls, just assume they work
-  end  
+  end
 
   it "should run the robot" do
     setup_release_item(@druid,:item,nil)
@@ -22,7 +22,7 @@ describe Robots::DorRepo::Release::ReleaseMembers do
       @r.perform(@work_item)
     end
   end
-  
+
   it "should run for a collection but never add workflow or ask for item members when the collection is released to self only" do
     members={"sets"=>[{"druid"=>"druid:bb001zc5754", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"French Grand Prix and 12 Hour Rheims: 1954", "catkey"=>"3051728"}]}
     setup_release_item(@druid,:collection,members)
@@ -48,7 +48,7 @@ describe Robots::DorRepo::Release::ReleaseMembers do
     expect(Dor::Release::Item).to receive(:create_workflow).once # one workflow added for the sub-collection
     @r.perform(@work_item)
   end
-  
+
   it "should run for a collection and execute the item_members method when the collection is not released to self" do
     members={"items"=>[{"druid"=>"druid:bb001zc5754", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"French Grand Prix and 12 Hour Rheims: 1954", "catkey"=>"3051728"},
                               {"druid"=>"druid:bb023nj3137", "latest_change"=>"2014-06-06T05:06:06Z", "title"=>"Snetterton Vanwall Trophy: 1958", "catkey"=>"3051732"},
@@ -77,7 +77,7 @@ describe Robots::DorRepo::Release::ReleaseMembers do
     expect(Dor::Release::Item).to receive(:add_workflow_for_item).exactly(4).times # four workflows added, one for each item
     @r.perform(@work_item)
   end
-    
+
   it "should run for a collection and execute the sub_collection method" do
     collections=[{"druid"=>"druid:bb001zc5754"},{"druid"=>"druid:bb023nj3137"}]
     setup_release_item(@druid,:collection,{"collections"=>collections})
@@ -101,5 +101,5 @@ describe Robots::DorRepo::Release::ReleaseMembers do
     expect(Dor::Release::Item).to receive(:add_workflow_for_collection).exactly(2).times # only two workflows added (it doesn't add a workflow for itself)
     @r.perform(@work_item)
   end
-        
+
 end

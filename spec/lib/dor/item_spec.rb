@@ -12,7 +12,7 @@ describe Dor::Release::Item do
     allow(@client).to receive(:get_collection).and_return(@response)
     @item.fetcher = @client
 
-    @dor_object = double(Dor)
+    @dor_object = instance_double(Dor::Item)
     allow(Dor).to receive(:find).and_return(@dor_object)
     allow(Dor::WorkflowObject).to receive(:initial_workflow).with(Dor::Config.release.workflow_name).and_return(true)
     allow(Dor::WorkflowObject).to receive(:initial_repo).with(Dor::Config.release.workflow_name).and_return(true)

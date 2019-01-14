@@ -335,13 +335,6 @@ RSpec/PredicateMatcher:
   Exclude:
     - 'spec/lib/dor/item_spec.rb'
 
-# Offense count: 3
-# Configuration parameters: IgnoreSymbolicNames.
-RSpec/VerifiedDoubles:
-  Exclude:
-    - 'spec/lib/dor/item_spec.rb'
-    - 'spec/spec_helper.rb'
-
 # Offense count: 5
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
