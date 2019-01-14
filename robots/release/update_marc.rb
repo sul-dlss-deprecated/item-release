@@ -7,7 +7,7 @@ module Robots
         def initialize
           super('dor', Dor::Config.release.workflow_name, 'update-marc', check_queued_status: true) # init LyberCore::Robot
         end
-        
+
         # `perform` is the main entry point for the robot. This is where
         # all of the robot's work is done.
         #

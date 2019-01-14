@@ -1,30 +1,29 @@
-CERT_DIR = File.join(File.dirname(__FILE__), "../..", "certs")
+CERT_DIR = File.join(File.dirname(__FILE__), '../..', 'certs')
 
 Dor::Config.configure do
-
   fedora do
     url       'https://USERNAME:PASSWORD@example.com/fedora'
   end
 
   ssl do
-    cert_file File.join(CERT_DIR, "dlss-dev-test.crt")
-    key_file  File.join(CERT_DIR, "dlss-dev-test.key")
+    cert_file File.join(CERT_DIR, 'dlss-dev-test.crt')
+    key_file  File.join(CERT_DIR, 'dlss-dev-test.key')
     key_pass  ''
   end
-  
+
   workflow.url 'https://example.com/workflow/'
   solr.url 'http://localhost:8983/solr/argo'
 
-  robots do 
+  robots do
     workspace '/tmp'
   end
-  
+
   release do
     fetcher_root 'http://localhost:3000/'
     workflow_name 'releaseWF'
-    max_tries  1  # the number of attempts to retry service calls before failing
-    max_sleep_seconds   1  # max sleep seconds between tries
-    base_sleep_seconds  1   # base sleep seconds between tries
+    max_tries 1 # the number of attempts to retry service calls before failing
+    max_sleep_seconds   1 # max sleep seconds between tries
+    base_sleep_seconds  1 # base sleep seconds between tries
   end
 
   stacks do
@@ -37,12 +36,11 @@ Dor::Config.configure do
     url 'https://stacks-test.stanford.edu'
     iiif_profile 'http://iiif.io/api/image/2/level1.json'
   end
-  
+
   dor do
     service_root 'https://USERNAME:PASSWORD@example.com/dor/v1'
   end
-   
 end
 
-REDIS_URL = '127.0.0.1:6379/resque:development' # hostname:port[:db]/namespace
+REDIS_URL = '127.0.0.1:6379/resque:development'.freeze # hostname:port[:db]/namespace
 # REDIS_TIMEOUT = '5' # seconds

@@ -16,17 +16,20 @@ module Dor::Release
     end
 
     def members
-      unless @members # if members have not been fetched and cached for this object yet, fetch them
+      # rubocop:disable Style/UnneededCondition
+      # See https://github.com/rubocop-hq/rubocop/issues/6668
+      if @members
+
+        @members # return cached instance variable
+
+      else # if members have not been fetched and cached for this object yet, fetch them
 
         with_retries(max_tries: Dor::Config.release.max_tries, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
           @members = @fetcher.get_collection(@druid) # cache members in an instance variable
         end
 
-      else
-
-        @members # return cached instance variable
-
       end
+      # rubocop:enable Style/UnneededCondition
     end
 
     def item_members
@@ -38,7 +41,7 @@ module Dor::Release
         @sub_collections = []
         @sub_collections += members['sets'] if members['sets']
         @sub_collections += members['collections'] if members['collections']
-        @sub_collections.delete_if {|collection| collection['druid'] == druid} # if this is a collection, do not include yourself in the sub-collection list
+        @sub_collections.delete_if { |collection| collection['druid'] == druid } # if this is a collection, do not include yourself in the sub-collection list
       end
       @sub_collections
     end
@@ -77,7 +80,7 @@ module Dor::Release
     def update_marc_record
       with_retries(max_tries: Dor::Config.release.max_tries, base_sleep_seconds: Dor::Config.release.base_sleep_seconds, max_sleep_seconds: Dor::Config.release.max_sleep_seconds) do |_attempt|
         url = "#{Dor::Config.dor.service_root}/objects/#{@druid}/update_marc_record"
-        response = RestClient.post url,{}
+        response = RestClient.post url, {}
         response.code
       end
     end
@@ -98,6 +101,5 @@ module Dor::Release
         Dor::Config.workflow.client.create_workflow(Dor::WorkflowObject.initial_repo(Dor::Config.release.workflow_name), druid, Dor::Config.release.workflow_name, Dor::WorkflowObject.initial_workflow(Dor::Config.release.workflow_name), {})
       end
     end
-
   end # class Item
 end # module

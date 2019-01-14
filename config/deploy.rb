@@ -4,16 +4,16 @@
 set :application, 'item-release'
 set :repo_url, 'https://github.com/sul-dlss/item-release.git'
 
-set :home_directory, "/home/lyberadmin"
+set :home_directory, '/home/lyberadmin'
 
-#set :branch, 'master'
+# set :branch, 'master'
 
 # Default branch is :master
 ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
 
 # Default deploy_to directory is /var/www/my_app
 set :deploy_to, "#{fetch(:home_directory)}/#{fetch(:application)}"
-set :whenever_identifier, ->{ "#{fetch(:application)}_#{fetch(:stage)}" }
+set :whenever_identifier, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
 
 # Default value for :scm is :git
 # set :scm, :git
@@ -40,13 +40,12 @@ set :log_level, :info
 # Default value for keep_releases is 5
 # set :keep_releases, 5
 
-set :stages, %W(development staging production)
-set :default_stage, "development"
-set :linked_dirs, %w(log run config/environments config/certs)
-set :linked_files, %w(config/honeybadger.yml)
+set :stages, %w[development staging production]
+set :default_stage, 'development'
+set :linked_dirs, %w[log run config/environments config/certs]
+set :linked_files, %w[config/honeybadger.yml]
 
 namespace :deploy do
-
   desc 'Restart application'
   task :restart do
     on roles(:app), in: :sequence, wait: 10 do
@@ -65,7 +64,6 @@ namespace :deploy do
   end
 
   after :publishing, :restart
-
 end
 
 set :honeybadger_env, fetch(:stage)

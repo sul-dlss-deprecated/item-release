@@ -13,13 +13,13 @@ group :development, :test do
   gem 'coveralls', require: false
   gem 'vcr'
   gem 'rspec'
-  gem 'rubocop', '~> 0.52.1'
+  gem 'rubocop', '~> 0.62.0'
   gem 'rubocop-rspec'
   gem 'webmock'
 end
 
 group :development do
-  if File.exist?(mygems = File.join(ENV['HOME'],'.gemfile'))
+  if File.exist?(mygems = File.join(ENV['HOME'], '.gemfile'))
     instance_eval(File.read(mygems))
   end
   gem 'capistrano', '~> 3.0'
