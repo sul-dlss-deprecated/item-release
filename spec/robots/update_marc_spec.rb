@@ -4,7 +4,7 @@ describe Robots::DorRepo::Release::UpdateMarc do
 
   before :each do
     @druid='aa222cc3333'
-    setup_work_item(@druid)
+    @work_item = instance_double(Dor::Item)
     @r = Robots::DorRepo::Release::UpdateMarc.new
   end
 
