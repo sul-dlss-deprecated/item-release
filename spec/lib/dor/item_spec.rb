@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Dor::Release::Item do
+  let(:xml) { '<xml/>' }
+
   before do
     @druid = 'oo000oo0001'
     @item = Dor::Release::Item.new(druid: @druid, skip_heartbeat: true) # skip heartbeat check for dor-fetcher
@@ -14,8 +16,8 @@ describe Dor::Release::Item do
 
     @dor_object = instance_double(Dor::Item)
     allow(Dor).to receive(:find).and_return(@dor_object)
-    allow(Dor::WorkflowObject).to receive(:initial_workflow).with(Dor::Config.release.workflow_name).and_return(true)
     allow(Dor::WorkflowObject).to receive(:initial_repo).with(Dor::Config.release.workflow_name).and_return(true)
+    allow(Dor::Services::Client).to receive_message_chain(:workflows, :initial).and_return(xml)
   end
 
   it 'initializes' do
@@ -51,12 +53,14 @@ describe Dor::Release::Item do
   end
 
   it 'adds the workflow for a collection' do
-    expect(Dor::Config.workflow.client).to receive(:create_workflow).with(Dor::WorkflowObject.initial_repo(Dor::Config.release.workflow_name), @druid, Dor::Config.release.workflow_name, Dor::WorkflowObject.initial_workflow(Dor::Config.release.workflow_name), {}).once
+    expect(Dor::Config.workflow.client).to receive(:create_workflow).with(Dor::WorkflowObject.initial_repo(Dor::Config.release.workflow_name), @druid, Dor::Config.release.workflow_name, xml, {}).once
+    expect(Dor::Services::Client).to receive_message_chain(:workflows, :initial).with(name: Dor::Config.release.workflow_name)
     Dor::Release::Item.add_workflow_for_collection(@druid)
   end
 
   it 'adds the workflow for an item' do
-    expect(Dor::Config.workflow.client).to receive(:create_workflow).with(Dor::WorkflowObject.initial_repo(Dor::Config.release.workflow_name), @druid, Dor::Config.release.workflow_name, Dor::WorkflowObject.initial_workflow(Dor::Config.release.workflow_name), {}).once
+    expect(Dor::Config.workflow.client).to receive(:create_workflow).with(Dor::WorkflowObject.initial_repo(Dor::Config.release.workflow_name), @druid, Dor::Config.release.workflow_name, xml, {}).once
+    expect(Dor::Services::Client).to receive_message_chain(:workflows, :initial).with(name: Dor::Config.release.workflow_name)
     Dor::Release::Item.add_workflow_for_item(@druid)
   end
 

@@ -14,6 +14,12 @@ Dor::Config.configure do
   workflow.url 'https://example.com/workflow/'
   solr.url 'http://localhost:8080/solr/argo'
 
+  dor_services do
+    url ''
+    username ''
+    password ''
+  end
+
   robots do
     workspace '/tmp'
   end

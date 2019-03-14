@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'dor-services', '~> 6.1', '>= 6.1.10'
+gem 'dor-services-client', '~> 1.2'
 gem 'lyber-core', '~> 4.0', '>= 4.0.3'
 gem 'robot-controller', '~> 2.0' # requires Resque
 gem 'pry', '~> 0.10.0'          # for bin/console
@@ -25,6 +26,7 @@ group :development do
   gem 'capistrano', '~> 3.0'
   gem 'capistrano-bundler', '~> 1.1'
   gem 'dlss-capistrano'
+  gem 'byebug'
 end
 
 gem 'honeybadger'
